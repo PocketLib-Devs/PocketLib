@@ -14,6 +14,51 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">/* --- Main Background --- */
+QWidget {
+    background-color: #F8F9FA; /* A very soft, clean light gray */
+}
+
+/* --- Labels (Username &amp; Password) --- */
+QLabel {
+    color: #2C3E50; /* A dark, professional slate gray */
+}
+
+/* --- Text Input Fields (QLineEdit) --- */
+QLineEdit {
+    background-color: #FFFFFF;
+    border: 2px solid #DCE1E6; /* Soft gray border */
+    border-radius: 5px; /* Subtle rounded corners */
+    color: #333333;
+    padding: 2px 6px; /* Just enough internal space so text doesn't touch the line */
+}
+
+/* Highlight the box in blue when the user is actively typing */
+QLineEdit:focus {
+    border: 2px solid #007BFF; 
+    background-color: #F0F7FF; /* Very faint blue tint */
+}
+
+/* --- The Login Button (QPushButton) --- */
+QPushButton {
+    background-color: #007BFF; /* Primary vibrant blue */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px; /* Internal padding only, does not affect outside layout */
+}
+
+/* When the mouse hovers over the button */
+QPushButton:hover {
+    background-color: #0056B3; /* Darker blue */
+}
+
+/* When the button is actively clicked */
+QPushButton:pressed {
+    background-color: #004085; /* Deepest blue */
+}</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
@@ -21,41 +66,78 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="page">
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QWidget" name="formLayoutWidget">
         <property name="geometry">
          <rect>
-          <x>330</x>
-          <y>290</y>
-          <width>93</width>
-          <height>29</height>
+          <x>170</x>
+          <y>80</y>
+          <width>481</width>
+          <height>331</height>
          </rect>
         </property>
-        <property name="text">
-         <string>Login</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="usernameBox">
-        <property name="geometry">
-         <rect>
-          <x>320</x>
-          <y>200</y>
-          <width>113</width>
-          <height>26</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="passwordBox">
-        <property name="geometry">
-         <rect>
-          <x>320</x>
-          <y>240</y>
-          <width>113</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::EchoMode::Password</enum>
-        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Username</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="passwordBox">
+           <property name="font">
+            <font>
+             <pointsize>15</pointsize>
+            </font>
+           </property>
+           <property name="echoMode">
+            <enum>QLineEdit::EchoMode::Password</enum>
+           </property>
+           <property name="placeholderText">
+            <string>Enter your Password</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Password</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="usernameBox">
+           <property name="font">
+            <font>
+             <pointsize>15</pointsize>
+            </font>
+           </property>
+           <property name="placeholderText">
+            <string>Enter your username</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="page_3"/>
@@ -70,7 +152,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

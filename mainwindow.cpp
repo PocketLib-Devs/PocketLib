@@ -1,10 +1,10 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QDebug>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include "./ui_mainwindow.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -52,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     query.exec("INSERT OR IGNORE INTO Users (LibraryID, Password, Role) "
                "VALUES ('User01', 'userpass', 'Consumer')");
-
 }
 
 MainWindow::~MainWindow()
@@ -94,4 +93,3 @@ void MainWindow::on_pushButton_clicked()
         qDebug() << "Database query error!";
     }
 }
-
