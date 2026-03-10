@@ -1,0 +1,13 @@
+# ninja log v6
+38	235	7945669219752712	PocketLibApp_autogen/timestamp	b297827a82cfa6e
+38	235	7945669219752712	C:/Users/DELL/Documents/GitHub/PocketLib/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/PocketLibApp_autogen/mocs_compilation.cpp	b297827a82cfa6e
+603	2496	7945663360476767	CMakeFiles/PocketLibApp.dir/PocketLibApp_autogen/mocs_compilation.cpp.obj	8f5791293b675a7c
+38	235	7945669219752712	PocketLibApp_autogen/mocs_compilation.cpp	b297827a82cfa6e
+38	235	7945669219752712	C:/Users/DELL/Documents/GitHub/PocketLib/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/PocketLibApp_autogen/timestamp	b297827a82cfa6e
+607	2531	7945663360516908	CMakeFiles/PocketLibApp.dir/main.cpp.obj	cbd6fc3c77673315
+236	2195	7945669221743196	CMakeFiles/PocketLibApp.dir/mainwindow.cpp.obj	2ebe4155eb79a4f9
+2195	2389	7945669241335608	PocketLibApp.exe	d199d9cc54dcbc42
+39	341	7945810543361018	PocketLibApp_autogen/timestamp	b297827a82cfa6e
+39	341	7945810543361018	PocketLibApp_autogen/mocs_compilation.cpp	b297827a82cfa6e
+39	341	7945810543361018	C:/Users/DELL/Documents/GitHub/PocketLib/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/PocketLibApp_autogen/timestamp	b297827a82cfa6e
+39	341	7945810543361018	C:/Users/DELL/Documents/GitHub/PocketLib/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/PocketLibApp_autogen/mocs_compilation.cpp	b297827a82cfa6e

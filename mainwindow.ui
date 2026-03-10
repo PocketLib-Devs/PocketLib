@@ -6,71 +6,164 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>933</width>
+    <height>631</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>933</width>
+    <height>631</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="page">
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>330</x>
-          <y>290</y>
-          <width>93</width>
-          <height>29</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Login</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="usernameBox">
-        <property name="geometry">
-         <rect>
-          <x>320</x>
-          <y>200</y>
-          <width>113</width>
-          <height>26</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="passwordBox">
-        <property name="geometry">
-         <rect>
-          <x>320</x>
-          <y>240</y>
-          <width>113</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::EchoMode::Password</enum>
-        </property>
-       </widget>
+   <property name="styleSheet">
+    <string notr="true">/* --- Global Font Settings --- */
+QWidget {
+    font-family: &quot;Segoe UI&quot;, Arial, sans-serif;
+    background-color: #F4F7F6; /* Soft light gray background */
+}
+
+/* --- Labels (Username &amp; Password) --- */
+QLabel {
+    color: #2C3E50;
+    font-size: 14px;
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+/* --- Text Input Fields (QLineEdit) --- */
+QLineEdit {
+    background-color: #FFFFFF;
+    border: 2px solid #D1D9E6;
+    border-radius: 8px; /* Rounded corners */
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333333;
+    min-height: 25px;
+}
+
+/* Highlight the text box in blue when the user clicks inside to type */
+QLineEdit:focus {
+    border: 2px solid #4A90E2; 
+    background-color: #FAFCFF;
+}
+
+/* Placeholder text styling (if supported by your Qt version) */
+QLineEdit::placeholder {
+    color: #A0AAB5;
+}
+
+/* --- The Login Button (QPushButton) --- */
+QPushButton {
+    background-color: #4A90E2; /* Modern blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 150px;
+}
+
+QPushButton:hover {
+    background-color: #357ABD; /* Darker blue on hover */
+}
+
+QPushButton:pressed {
+    background-color: #285A8F; /* Even darker on click */
+    /* Shifts the text down slightly to simulate a physical button press */
+    padding-top: 12px; 
+    padding-bottom: 8px;
+}</string>
+   </property>
+   <widget class="QWidget" name="formLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>100</y>
+      <width>541</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Username:</string>
+       </property>
       </widget>
-      <widget class="QWidget" name="page_3"/>
-      <widget class="QWidget" name="page_2"/>
-     </widget>
-    </item>
-   </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="usernameBox">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="placeholderText">
+        <string>Enter your username</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="passwordBox">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::EchoMode::Password</enum>
+       </property>
+       <property name="placeholderText">
+        <string>Enter your Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Login</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>-1</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Password:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>26</height>
+     <width>933</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
