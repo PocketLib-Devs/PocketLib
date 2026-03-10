@@ -21,23 +21,34 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
+<<<<<<< HEAD
     <string notr="true">/* --- Global Font Settings --- */
 QWidget {
     font-family: &quot;Segoe UI&quot;, Arial, sans-serif;
     background-color: #F4F7F6; /* Soft light gray background */
+=======
+    <string notr="true">/* --- Main Background --- */
+QWidget {
+    background-color: #F8F9FA; /* A very soft, clean light gray */
+>>>>>>> 75e0a46c381a62b87aa719128dc2c7e467333b02
 }
 
 /* --- Labels (Username &amp; Password) --- */
 QLabel {
+<<<<<<< HEAD
     color: #2C3E50;
     font-size: 14px;
     font-weight: bold;
     padding-right: 5px;
+=======
+    color: #2C3E50; /* A dark, professional slate gray */
+>>>>>>> 75e0a46c381a62b87aa719128dc2c7e467333b02
 }
 
 /* --- Text Input Fields (QLineEdit) --- */
 QLineEdit {
     background-color: #FFFFFF;
+<<<<<<< HEAD
     border: 2px solid #D1D9E6;
     border-radius: 8px; /* Rounded corners */
     padding: 8px 12px;
@@ -55,10 +66,23 @@ QLineEdit:focus {
 /* Placeholder text styling (if supported by your Qt version) */
 QLineEdit::placeholder {
     color: #A0AAB5;
+=======
+    border: 2px solid #DCE1E6; /* Soft gray border */
+    border-radius: 5px; /* Subtle rounded corners */
+    color: #333333;
+    padding: 2px 6px; /* Just enough internal space so text doesn't touch the line */
+}
+
+/* Highlight the box in blue when the user is actively typing */
+QLineEdit:focus {
+    border: 2px solid #007BFF; 
+    background-color: #F0F7FF; /* Very faint blue tint */
+>>>>>>> 75e0a46c381a62b87aa719128dc2c7e467333b02
 }
 
 /* --- The Login Button (QPushButton) --- */
 QPushButton {
+<<<<<<< HEAD
     background-color: #4A90E2; /* Modern blue */
     color: white;
     border: none;
@@ -102,6 +126,105 @@ QPushButton:pressed {
        <property name="text">
         <string>Username:</string>
        </property>
+=======
+    background-color: #007BFF; /* Primary vibrant blue */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px; /* Internal padding only, does not affect outside layout */
+}
+
+/* When the mouse hovers over the button */
+QPushButton:hover {
+    background-color: #0056B3; /* Darker blue */
+}
+
+/* When the button is actively clicked */
+QPushButton:pressed {
+    background-color: #004085; /* Deepest blue */
+}</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <widget class="QWidget" name="formLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>80</y>
+          <width>481</width>
+          <height>331</height>
+         </rect>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Username</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="passwordBox">
+           <property name="font">
+            <font>
+             <pointsize>15</pointsize>
+            </font>
+           </property>
+           <property name="echoMode">
+            <enum>QLineEdit::EchoMode::Password</enum>
+           </property>
+           <property name="placeholderText">
+            <string>Enter your Password</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Password</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="usernameBox">
+           <property name="font">
+            <font>
+             <pointsize>15</pointsize>
+            </font>
+           </property>
+           <property name="placeholderText">
+            <string>Enter your username</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+>>>>>>> 75e0a46c381a62b87aa719128dc2c7e467333b02
       </widget>
      </item>
      <item row="0" column="1">
@@ -162,7 +285,11 @@ QPushButton:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
+<<<<<<< HEAD
      <width>933</width>
+=======
+     <width>800</width>
+>>>>>>> 75e0a46c381a62b87aa719128dc2c7e467333b02
      <height>25</height>
     </rect>
    </property>
