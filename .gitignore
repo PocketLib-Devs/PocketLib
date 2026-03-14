@@ -82,3 +82,18 @@ Makefile*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Qt Creator internal settings
+.qtcreator/
+
+# Qt clangd indexing
+.qtc_clangd/
+
+# Build directory
+build/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
