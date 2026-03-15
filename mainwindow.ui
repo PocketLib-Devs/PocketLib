@@ -148,6 +148,9 @@ QPushButton:pressed {
           <height>31</height>
          </rect>
         </property>
+        <property name="text">
+         <string/>
+        </property>
         <property name="placeholderText">
          <string>Full Name</string>
         </property>

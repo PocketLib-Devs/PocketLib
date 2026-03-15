@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Start app at login screen
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
-    authManager = new AuthManager(FIREBASE_API_KEY, this);
-    firestoreClient = new FirestoreClient(FIREBASE_PROJECT_ID, this);
+    authManager = new AuthManager(this);
+    firestoreClient = new FirestoreClient(this);
 
 }
 
