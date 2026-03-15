@@ -78,9 +78,9 @@ void FirestoreClient::getBooks()
         }
 
         QByteArray data = reply->readAll();
-
-        QJsonDocument doc = QJsonDocument::fromJson(data);
-        QJsonArray docs = doc.object()["documents"].toArray();
+        QJsonDocument doc = QJsonDocument::fromJson(data); // <-- This is the line that went missing!
+        QJsonObject jsonObj = doc.object();
+        QJsonArray docs = jsonObj.value("documents").toArray();
 
         emit booksReceived(docs);
 

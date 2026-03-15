@@ -82,3 +82,6 @@ Makefile*
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.user
+build/
+.qtcreator/

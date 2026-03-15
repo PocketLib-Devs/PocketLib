@@ -146,21 +146,7 @@ QPushButton:pressed {
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="page_3">
-       <widget class="QLineEdit" name="searchBoxlineEdit">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>0</y>
-          <width>341</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="placeholderText">
-         <string>Search by book's or Author's name...</string>
-        </property>
-       </widget>
-      </widget>
+      <widget class="QWidget" name="page_3"/>
       <widget class="QWidget" name="page_2"/>
      </widget>
     </item>
