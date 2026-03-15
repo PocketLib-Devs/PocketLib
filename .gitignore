@@ -82,3 +82,28 @@ Makefile*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+
+# Qt Creator build folders
+build/
+build-*/
+
+# Qt Creator internal
+.qtc_clangd/
+*.creator
+*.creator.user
+*.files
+*.includes
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Qt Autogen files
+*_autogen/
+
+# Ninja build files
+.ninja_log
+.ninja_deps
+build.ninja

@@ -3,31 +3,23 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QJsonArray>
 
 class FirestoreClient : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit FirestoreClient(QString projectId, QObject *parent = nullptr);
+    explicit FirestoreClient(QObject *parent = nullptr);
 
-    void setAuthToken(QString token);
-
-    void addBook(QString title, QString author, int copies);
-    void getBooks();
-    void deleteBook(QString documentId);
+    void getBooks(const QString &idToken);
 
 signals:
-    void booksReceived(QJsonArray books);
-    void requestSuccess(QString message);
-    void requestError(QString error);
+    void booksReceived(QString data);
+    void firestoreError(QString error);
 
 private:
-    QString baseUrl;
-    QString idToken;
-
     QNetworkAccessManager *manager;
+    QString projectId = "pocketlib-ea41d";
 };
 
 #endif

@@ -1,57 +1,51 @@
 #include "mainwindow.h"
-#include <QDebug>
-#include <QMessageBox>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
 #include "./ui_mainwindow.h"
+#include <QMessageBox>
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("pocketlib.db");
 
-    if (!db.open()) {
-        qDebug() << "CRITICAL ERROR: Database failed to open!";
-        qDebug() << db.lastError().text();
-        return;
-    } else {
-        qDebug() << "SUCCESS: PocketLIB Database is online!";
-    }
+    authManager = new AuthManager(this);
+    firestoreClient = new FirestoreClient(this);
 
-    // 2. Create the Tables based on the PocketLIB requirements
-    QSqlQuery query;
+    connect(authManager, &AuthManager::loginSuccess,
+            this, [=](QString token, QString uid){
 
-    // Table 1: Users (Handles login, roles, and points)
-    query.exec("CREATE TABLE IF NOT EXISTS Users ("
-               "LibraryID TEXT PRIMARY KEY, "
-               "Password TEXT, "
-               "Role TEXT, "
-               "PointsBalance INTEGER DEFAULT 0)");
+                qDebug() << "Login successful!";
+                qDebug() << "UID:" << uid;
 
-    // Table 2: Books (Handles inventory) [cite: 24, 25, 26, 53, 54]
-    query.exec("CREATE TABLE IF NOT EXISTS Books ("
-               "BookID INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "Title TEXT, "
-               "Category TEXT, "
-               "Quantity INTEGER, "
-               "AvailableStatus TEXT)");
+                currentToken = token;
 
-    // Table 3: Transactions (Handles borrowing and fines) [cite: 30, 34, 35, 58, 65]
-    query.exec("CREATE TABLE IF NOT EXISTS Transactions ("
-               "LoanID INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "LibraryID TEXT, "
-               "BookID INTEGER, "
-               "DueDate TEXT, "
-               "FineAmount INTEGER DEFAULT 0)");
+                ui->stackedWidget->setCurrentWidget(ui->dashboardPage);
 
-    query.exec("INSERT OR IGNORE INTO Users (LibraryID, Password, Role) "
-               "VALUES ('Admin01', 'adminpass', 'Admin')");
+                firestoreClient->getBooks(currentToken);
+            });
 
-    query.exec("INSERT OR IGNORE INTO Users (LibraryID, Password, Role) "
-               "VALUES ('User01', 'userpass', 'Consumer')");
+    connect(authManager, &AuthManager::loginFailed,
+            this, [=](QString error){
+
+                QMessageBox::warning(this,"Login Failed",error);
+
+            });
+
+    connect(firestoreClient, &FirestoreClient::booksReceived,
+            this, [=](QString data){
+
+                qDebug() << "Books data:";
+                qDebug() << data;
+
+            });
+
+    connect(firestoreClient, &FirestoreClient::firestoreError,
+            this, [=](QString error){
+
+                qDebug() << "Firestore error:" << error;
+
+            });
 }
 
 MainWindow::~MainWindow()
@@ -59,37 +53,61 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_loginButton_clicked()
 {
-    // 1. Grab the text from the UI boxes
-    QString enteredID = ui->usernameBox->text();
-    QString enteredPassword = ui->passwordBox->text();
+    QString email = ui->usernameBox->text();
+    QString password = ui->passwordBox->text();
 
-    // 2. Ask the database if this user exists
-    QSqlQuery query;
-    // We use placeholders (:) to safely pass variables into SQL
-    query.prepare("SELECT Role FROM Users WHERE LibraryID = :id AND Password = :password");
-    query.bindValue(":id", enteredID);
-    query.bindValue(":password", enteredPassword);
+    if(email.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this,"Error","Please enter credentials");
+        return;
+    }
 
-    // 3. Run the search
-    if (query.exec()) {
-        if (query.next()) {
-            // SUCCESS! The database found a matching row.
-            QString userRole = query.value(0).toString(); // Grab the 'Role' text
+    authManager->login(email, password);
+}
 
-            // 4. Route to the correct screen based on the Role
-            if (userRole == "Admin") {
-                ui->stackedWidget->setCurrentIndex(1); // Go to Admin Dashboard
-            } else if (userRole == "Consumer") {
-                ui->stackedWidget->setCurrentIndex(2); // Go to User Dashboard
-            }
+void MainWindow::on_logoutButton_clicked()
+{
+    QMessageBox::StandardButton reply;
 
-        } else {
-            // FAILED! No match was found.
-            QMessageBox::warning(this, "Login Failed", "Incorrect Library ID or Password.");
-        }
-    } else {
-        qDebug() << "Database query error!";
+    reply = QMessageBox::question(this,
+                                  "Logout",
+                                  "Are you sure you want to logout?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if(reply == QMessageBox::Yes)
+    {
+        currentToken.clear();
+
+        ui->usernameBox->clear();
+        ui->passwordBox->clear();
+
+        ui->stackedWidget->setCurrentWidget(ui->loginPage);
     }
 }
+
+void MainWindow::on_openRegisterButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
+}
+
+void MainWindow::on_backToLoginButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+void MainWindow::on_registerButton_clicked()
+{
+    QString email = ui->registerEmailBox->text();
+    QString password = ui->registerPasswordBox->text();
+
+    if(email.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this,"Error","Enter all details");
+        return;
+    }
+
+    authManager->registerUser(email,password);
+}
+
