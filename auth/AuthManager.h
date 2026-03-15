@@ -3,7 +3,8 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QJsonObject>
+#include <functional>
 
 class AuthManager : public QObject
 {
@@ -12,16 +13,16 @@ class AuthManager : public QObject
 public:
     explicit AuthManager(QObject *parent = nullptr);
 
-    void login(const QString &email, const QString &password);
-    void registerUser(QString email, QString password);
+    void loginUser(QString email, QString password,
+                   std::function<void(QString token, QString uid)> callback);
 
-signals:
-    void loginSuccess(QString idToken, QString uid);
-    void loginFailed(QString error);
+    void registerUser(QString email, QString password,
+                      std::function<void(QString token, QString uid)> callback);
 
 private:
-    QNetworkAccessManager *manager;
-    QString apiKey = "AIzaSyDd4x5PuwJi8Coi4ii6o93QbcYeBr_ArIg";
+    QNetworkAccessManager networkManager;
+
+    const QString apiKey = "AIzaSyDd4x5PuwJi8Coi4ii6o93QbcYeBr_ArIg";
 };
 
 #endif

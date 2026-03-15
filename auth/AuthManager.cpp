@@ -1,15 +1,17 @@
-#include "authmanager.h"
+#include "AuthManager.h"
+
 #include <QNetworkRequest>
+#include <QNetworkReply>
 #include <QJsonDocument>
-#include <QJsonObject>
+#include <QUrl>
 
 AuthManager::AuthManager(QObject *parent)
     : QObject(parent)
 {
-    manager = new QNetworkAccessManager(this);
 }
 
-void AuthManager::login(const QString &email, const QString &password)
+void AuthManager::loginUser(QString email, QString password,
+                            std::function<void(QString token, QString uid)> callback)
 {
     QString url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="
@@ -18,39 +20,43 @@ void AuthManager::login(const QString &email, const QString &password)
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonObject json;
-    json["email"] = email;
-    json["password"] = password;
-    json["returnSecureToken"] = true;
+    QJsonObject body;
+    body["email"] = email;
+    body["password"] = password;
+    body["returnSecureToken"] = true;
 
-    QJsonDocument doc(json);
+    QNetworkReply *reply =
+        networkManager.post(request, QJsonDocument(body).toJson());
 
-    QNetworkReply *reply = manager->post(request, doc.toJson());
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray response = reply->readAll();
 
-    connect(reply, &QNetworkReply::finished, [=]() {
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+                QJsonObject json = jsonDoc.object();
 
-        if(reply->error())
-        {
-            emit loginFailed(reply->errorString());
-            reply->deleteLater();
-            return;
-        }
+                // Check if Firebase returned an error
+                if (json.contains("error")) {
+                    QString message =
+                        json["error"].toObject()["message"].toString();
 
-        QByteArray response = reply->readAll();
-        QJsonDocument resDoc = QJsonDocument::fromJson(response);
-        QJsonObject obj = resDoc.object();
+                    qDebug() << "Login failed:" << message;
 
-        QString idToken = obj["idToken"].toString();
-        QString uid = obj["localId"].toString();
+                    callback("", "");
+                }
+                else {
+                    QString token = json["idToken"].toString();
+                    QString uid = json["localId"].toString();
 
-        emit loginSuccess(idToken, uid);
+                    callback(token, uid);
+                }
 
-        reply->deleteLater();
-    });
+                reply->deleteLater();
+            });
 }
 
-
-void AuthManager::registerUser(QString email, QString password)
+void AuthManager::registerUser(QString email, QString password,
+                               std::function<void(QString token, QString uid)> callback)
 {
     QString url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key="
@@ -59,32 +65,36 @@ void AuthManager::registerUser(QString email, QString password)
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonObject json;
-    json["email"] = email;
-    json["password"] = password;
-    json["returnSecureToken"] = true;
+    QJsonObject body;
+    body["email"] = email;
+    body["password"] = password;
+    body["returnSecureToken"] = true;
 
-    QJsonDocument doc(json);
+    QNetworkReply *reply =
+        networkManager.post(request, QJsonDocument(body).toJson());
 
-    QNetworkReply *reply = manager->post(request, doc.toJson());
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray response = reply->readAll();
 
-    connect(reply, &QNetworkReply::finished, [=]() {
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+                QJsonObject json = jsonDoc.object();
 
-        if(reply->error())
-        {
-            emit loginFailed(reply->errorString());
-            reply->deleteLater();
-            return;
-        }
+                if (json.contains("error")) {
+                    QString message =
+                        json["error"].toObject()["message"].toString();
 
-        QByteArray response = reply->readAll();
-        QJsonDocument resDoc = QJsonDocument::fromJson(response);
+                    qDebug() << "Registration failed:" << message;
 
-        QString idToken = resDoc.object()["idToken"].toString();
-        QString uid = resDoc.object()["localId"].toString();
+                    callback("", "");
+                }
+                else {
+                    QString token = json["idToken"].toString();
+                    QString uid = json["localId"].toString();
 
-        emit loginSuccess(idToken, uid);
+                    callback(token, uid);
+                }
 
-        reply->deleteLater();
-    });
+                reply->deleteLater();
+            });
 }

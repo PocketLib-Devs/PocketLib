@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "auth/authmanager.h"
-#include "firestore/firestoreclient.h"
+#include "auth/AuthManager.h"
+#include "firestore/FirestoreClient.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,15 +18,14 @@ public:
     ~MainWindow();
 
 private slots:
+
     void on_loginButton_clicked();
-
-    void on_logoutButton_clicked();
-
     void on_openRegisterButton_clicked();
-
+    void on_registerButton_clicked();
     void on_backToLoginButton_clicked();
 
-    void on_registerButton_clicked();
+    void on_logoutStudent_clicked();
+    void on_logoutAdmin_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -35,6 +34,9 @@ private:
     FirestoreClient *firestoreClient;
 
     QString currentToken;
+    QString currentUID;
+
+    void openDashboard(QString role);
 };
 
 #endif

@@ -66,7 +66,7 @@ QPushButton:pressed {
        <number>1</number>
       </property>
       <widget class="QWidget" name="loginPage">
-       <widget class="QLineEdit" name="usernameBox">
+       <widget class="QLineEdit" name="loginEmail">
         <property name="geometry">
          <rect>
           <x>290</x>
@@ -79,7 +79,7 @@ QPushButton:pressed {
          <string>Enter Email</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="passwordBox">
+       <widget class="QLineEdit" name="loginPassword">
         <property name="geometry">
          <rect>
           <x>290</x>
@@ -139,7 +139,7 @@ QPushButton:pressed {
        </widget>
       </widget>
       <widget class="QWidget" name="registerPage">
-       <widget class="QLineEdit" name="nameBox">
+       <widget class="QLineEdit" name="registerName">
         <property name="geometry">
          <rect>
           <x>250</x>
@@ -152,7 +152,7 @@ QPushButton:pressed {
          <string>Full Name</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="registerPasswordBox">
+       <widget class="QLineEdit" name="registerPassword">
         <property name="geometry">
          <rect>
           <x>250</x>
@@ -168,7 +168,7 @@ QPushButton:pressed {
          <string>Password</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="registerEmailBox">
+       <widget class="QLineEdit" name="registerEmail">
         <property name="geometry">
          <rect>
           <x>250</x>
@@ -208,7 +208,7 @@ QPushButton:pressed {
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="dashboardPage">
+      <widget class="QWidget" name="studentDashboardPage">
        <widget class="QLabel" name="label">
         <property name="geometry">
          <rect>
@@ -222,13 +222,41 @@ QPushButton:pressed {
          <string>Library Dashboard</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="logoutButton">
+       <widget class="QPushButton" name="logoutStudent">
         <property name="geometry">
          <rect>
           <x>330</x>
           <y>440</y>
           <width>90</width>
           <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Logout</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="adminDashboardPage">
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>20</y>
+          <width>141</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Admin Dashboard</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="logoutAdmin">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>270</y>
+          <width>90</width>
+          <height>41</height>
          </rect>
         </property>
         <property name="text">

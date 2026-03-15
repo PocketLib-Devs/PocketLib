@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <functional>
 
 class FirestoreClient : public QObject
 {
@@ -11,15 +12,15 @@ class FirestoreClient : public QObject
 public:
     explicit FirestoreClient(QObject *parent = nullptr);
 
-    void getBooks(const QString &idToken);
+    void createUser(QString uid, QString email, QString role, QString token);
 
-signals:
-    void booksReceived(QString data);
-    void firestoreError(QString error);
+    void getUserRole(QString uid, QString token,
+                     std::function<void(QString role)> callback);
 
 private:
-    QNetworkAccessManager *manager;
-    QString projectId = "pocketlib-ea41d";
+    QNetworkAccessManager networkManager;
+
+    const QString projectId = "pocketlib-ea41d";
 };
 
 #endif
