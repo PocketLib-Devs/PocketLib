@@ -1,21 +1,25 @@
 #include "mainwindow.h"
+
+#include <QMessageBox>
+#include <QDebug>
 #include "ui_mainwindow.h"
 #include "config.h"
-#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
+    
+
     ui->setupUi(this);
 
+    // Start app at login screen
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(FIREBASE_API_KEY, this);
-    dbClient = new FirestoreClient(FIREBASE_PROJECT_ID, this);
+    firestoreClient = new FirestoreClient(FIREBASE_PROJECT_ID, this);
 
-    // 2. Connect the AuthManager internet signals to your local slots
-    connect(authManager, &AuthManager::loginSuccess, this, &MainWindow::onLoginSuccess);
-    connect(authManager, &AuthManager::loginFailed, this, &MainWindow::onLoginFailed);
 }
 
 MainWindow::~MainWindow()
@@ -23,30 +27,126 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    // 1. Grab the text from the UI boxes
-    // IMPORTANT: Firebase requires an EMAIL (e.g., admin@pocketlib.com), not just "Admin01"
-    QString enteredEmail = ui->usernameBox->text();
-    QString enteredPassword = ui->passwordBox->text();
+//////////////////////////////////////////////////////////////
+// LOGIN
+//////////////////////////////////////////////////////////////
 
-    // 2. Ask Firebase to authenticate this user over the internet
-    // This function will run, and the app will keep working while it waits for a reply.
-    authManager->login(enteredEmail, enteredPassword);
+void MainWindow::on_loginButton_clicked()
+{
+    QString email = ui->loginEmail->text();
+    QString password = ui->loginPassword->text();
+
+    authManager->loginUser(email, password,
+                           [this](QString token, QString uid)
+                           {
+                               // If login failed
+                               if (token.isEmpty()) {
+                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
+                                   return;
+                               }
+
+                               // If login succeeded → check role from Firestore
+                               firestoreClient->getUserRole(uid, token,
+                                                            [this](QString role)
+                                                            {
+                                                                if (role == "admin") {
+                                                                    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+                                                                }
+                                                                else if (role == "student") {
+                                                                    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+                                                                }
+                                                            });
+                           });
 }
 
-// 3. This runs automatically when Firebase says "Yes, password is correct!"
-void MainWindow::onLoginSuccess()
-{
-    // Give the database client the security token so it can fetch books later
-    dbClient->setAuthToken(authManager->getToken());
+//////////////////////////////////////////////////////////////
+// REGISTER PAGE OPEN
+//////////////////////////////////////////////////////////////
 
-    // Route to the dashboard (Using the UI name from your screenshot)
-    ui->stackedWidget->setCurrentIndex(1);
+void MainWindow::on_openRegisterButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
 }
 
-// 4. This runs automatically if the password/email is wrong
-void MainWindow::onLoginFailed(QString error)
+//////////////////////////////////////////////////////////////
+// BACK TO LOGIN
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_backToLoginButton_clicked()
 {
-    QMessageBox::warning(this, "Login Failed", "Incorrect Email or Password.\n" + error);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+//////////////////////////////////////////////////////////////
+// REGISTER USER
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_registerButton_clicked()
+{
+    QString email = ui->registerEmail->text();
+    QString password = ui->registerPassword->text();
+
+    if(email.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this,"Error","Enter email and password");
+        return;
+    }
+
+    authManager->registerUser(email, password,
+                      [this, email](QString token, QString uid)
+                      {
+                          // Create user record in Firestore
+                          firestoreClient->createUser(uid, email, "student", token);
+
+                          QMessageBox::information(this,"Success","Account created successfully!");
+
+                          ui->stackedWidget->setCurrentIndex(0);
+                      }
+                      );
+}
+
+//////////////////////////////////////////////////////////////
+// OPEN DASHBOARD BASED ON ROLE
+//////////////////////////////////////////////////////////////
+
+void MainWindow::openDashboard(QString role)
+{
+    if(role == "admin")
+    {
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    }
+    else
+    {
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+    }
+}
+
+//////////////////////////////////////////////////////////////
+// LOGOUT (STUDENT)
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_logoutStudent_clicked()
+{
+    currentToken.clear();
+    currentUID.clear();
+
+    ui->loginEmail->clear();
+    ui->loginPassword->clear();
+
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+//////////////////////////////////////////////////////////////
+// LOGOUT (ADMIN)
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_logoutAdmin_clicked()
+{
+    currentToken.clear();
+    currentUID.clear();
+
+    ui->loginEmail->clear();
+    ui->loginPassword->clear();
+
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }

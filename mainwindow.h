@@ -18,17 +18,26 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
 
-    void onLoginSuccess();
-    void onLoginFailed(QString error);
+    void on_loginButton_clicked();
+    void on_openRegisterButton_clicked();
+    void on_registerButton_clicked();
+    void on_backToLoginButton_clicked();
+
+    void on_logoutStudent_clicked();
+    void on_logoutAdmin_clicked();
+
 
 private:
     Ui::MainWindow *ui;
 
-
     AuthManager *authManager;
-    FirestoreClient *dbClient;
+    FirestoreClient *firestoreClient;
+
+    QString currentToken;
+    QString currentUID;
+
+    void openDashboard(QString role);
 };
 
 #endif

@@ -4,106 +4,70 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QUrl>
 
-FirestoreClient::FirestoreClient(QString projectId, QObject *parent)
+FirestoreClient::FirestoreClient(QObject *parent)
     : QObject(parent)
 {
-    manager = new QNetworkAccessManager(this);
-
-    baseUrl =
-    "https://firestore.googleapis.com/v1/projects/" +
-    projectId +
-    "/databases/(default)/documents/";
 }
 
-void FirestoreClient::setAuthToken(QString token)
+void FirestoreClient::createUser(QString uid, QString email, QString role, QString token)
 {
-    idToken = token;
-}
+    QString url =
+        "https://firestore.googleapis.com/v1/projects/" + projectId +
+        "/databases/(default)/documents/users/" + uid;
 
-void FirestoreClient::addBook(QString title, QString author, int copies)
-{
+    QNetworkRequest request(url);
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
     QJsonObject fields;
 
-    fields["title"] =
-        QJsonObject{{"stringValue", title}};
+    fields["email"] = QJsonObject{
+        {"stringValue", email}
+    };
 
-    fields["author"] =
-        QJsonObject{{"stringValue", author}};
-
-    fields["availableCopies"] =
-        QJsonObject{{"integerValue", QString::number(copies)}};
+    fields["role"] = QJsonObject{
+        {"stringValue", role}
+    };
 
     QJsonObject body;
     body["fields"] = fields;
 
-    QJsonDocument doc(body);
-
-    QNetworkRequest request(baseUrl + "books");
-
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization",
-                         ("Bearer " + idToken).toUtf8());
-
-    QNetworkReply *reply =
-        manager->post(request, doc.toJson());
-
-    connect(reply, &QNetworkReply::finished, [=]() {
-
-        if(reply->error())
-            emit requestError(reply->errorString());
-        else
-            emit requestSuccess("Book added");
-
-        reply->deleteLater();
-    });
+    networkManager.sendCustomRequest(
+        request,
+        "PATCH",
+        QJsonDocument(body).toJson()
+        );
 }
 
-void FirestoreClient::getBooks()
+void FirestoreClient::getUserRole(QString uid, QString token,
+                                  std::function<void(QString role)> callback)
 {
-    QNetworkRequest request(baseUrl + "books");
+    QString url =
+        "https://firestore.googleapis.com/v1/projects/" + projectId +
+        "/databases/(default)/documents/users/" + uid;
 
-    request.setRawHeader("Authorization",
-                         ("Bearer " + idToken).toUtf8());
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
 
-    QNetworkReply *reply = manager->get(request);
+    QNetworkReply *reply = networkManager.get(request);
 
-    connect(reply, &QNetworkReply::finished, [=]() {
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray response = reply->readAll();
 
-        if(reply->error())
-        {
-            emit requestError(reply->errorString());
-            reply->deleteLater();
-            return;
-        }
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+                QJsonObject json = jsonDoc.object();
 
-        QByteArray data = reply->readAll();
+                QString role =
+                    json["fields"].toObject()
+                        ["role"].toObject()
+                                ["stringValue"].toString();
 
-        QJsonDocument doc = QJsonDocument::fromJson(data);
-        QJsonArray docs = doc.object()["documents"].toArray();
+                callback(role);
 
-        emit booksReceived(docs);
-
-        reply->deleteLater();
-    });
-}
-
-void FirestoreClient::deleteBook(QString documentId)
-{
-    QNetworkRequest request(baseUrl + "books/" + documentId);
-
-    request.setRawHeader("Authorization",
-                         ("Bearer " + idToken).toUtf8());
-
-    QNetworkReply *reply = manager->deleteResource(request);
-
-    connect(reply, &QNetworkReply::finished, [=]() {
-
-        if(reply->error())
-            emit requestError(reply->errorString());
-        else
-            emit requestSuccess("Book deleted");
-
-        reply->deleteLater();
-    });
+                reply->deleteLater();
+            });
 }
