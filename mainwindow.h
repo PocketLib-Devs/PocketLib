@@ -27,6 +27,7 @@ private slots:
     void on_logoutStudent_clicked();
     void on_logoutAdmin_clicked();
 
+
 private:
     Ui::MainWindow *ui;
 

@@ -57,7 +57,6 @@
 
 # Qt Build directories (Crucial!)
 build-*/
-build_*/
 *-build-*/
 
 # Qt Generated files (MOC, RCC, UIC)
@@ -107,3 +106,13 @@ cmake_install.cmake
 .ninja_log
 .ninja_deps
 build.ninja
+# Qt Creator internal settings
+.qtcreator/
+
+
+
+# Build directory
+compile_commands.json
+# Ignore Qt Creator local user files
+*.user
+CMakeLists.txt.user
