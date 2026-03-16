@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(this);
     firestoreClient = new FirestoreClient(this);
+    ui->widget->hide();
 
 }
 
@@ -150,3 +151,24 @@ void MainWindow::on_logoutAdmin_clicked()
 
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
+
+void MainWindow::on_sidebar_btn_clicked()
+{
+    bool isSidebarVisible = ui->widget->isVisible();
+    if(!isSidebarVisible) ui->widget->setVisible(true);
+    else ui->widget->setVisible(false);
+}
+
+
+void MainWindow::on_addBooks_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+}
+
+
+void MainWindow::on_back_btn_clicked()
+{
+    if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+

@@ -28,6 +28,12 @@ private slots:
     void on_logoutAdmin_clicked();
 
 
+    void on_sidebar_btn_clicked();
+
+    void on_addBooks_btn_clicked();
+
+    void on_back_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
