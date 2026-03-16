@@ -159,3 +159,16 @@ void MainWindow::on_sidebar_btn_clicked()
     else ui->widget->setVisible(false);
 }
 
+
+void MainWindow::on_addBooks_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+}
+
+
+void MainWindow::on_back_btn_clicked()
+{
+    if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+
