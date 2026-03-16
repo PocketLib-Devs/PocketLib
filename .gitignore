@@ -57,7 +57,6 @@
 
 # Qt Build directories (Crucial!)
 build-*/
-build_*/
 *-build-*/
 
 # Qt Generated files (MOC, RCC, UIC)
@@ -82,6 +81,38 @@ Makefile*
 .Trashes
 ehthumbs.db
 Thumbs.db
-*.user
+
+
+# Qt Creator build folders
 build/
+build-*/
+
+# Qt Creator internal
+.qtc_clangd/
+*.creator
+*.creator.user
+*.files
+*.includes
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Qt Autogen files
+*_autogen/
+
+# Ninja build files
+.ninja_log
+.ninja_deps
+build.ninja
+# Qt Creator internal settings
 .qtcreator/
+
+
+
+# Build directory
+compile_commands.json
+# Ignore Qt Creator local user files
+*.user
+CMakeLists.txt.user

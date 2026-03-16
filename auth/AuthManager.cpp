@@ -2,25 +2,20 @@
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QUrl>
 
-AuthManager::AuthManager(QString apiKey, QObject *parent)
-    : QObject(parent), apiKey(apiKey)
+AuthManager::AuthManager(QObject *parent)
+    : QObject(parent)
 {
-    manager = new QNetworkAccessManager(this);
 }
 
-QString AuthManager::getToken()
-{
-    return idToken;
-}
-
-void AuthManager::login(QString email, QString password)
+void AuthManager::loginUser(QString email, QString password,
+                            std::function<void(QString token, QString uid)> callback)
 {
     QString url =
-    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="
-    + apiKey;
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="
+        + apiKey;
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -30,26 +25,76 @@ void AuthManager::login(QString email, QString password)
     body["password"] = password;
     body["returnSecureToken"] = true;
 
-    QJsonDocument doc(body);
+    QNetworkReply *reply =
+        networkManager.post(request, QJsonDocument(body).toJson());
 
-    QNetworkReply *reply = manager->post(request, doc.toJson());
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray response = reply->readAll();
 
-    connect(reply, &QNetworkReply::finished, [=]() {
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+                QJsonObject json = jsonDoc.object();
 
-        if(reply->error())
-        {
-            emit loginFailed(reply->errorString());
-            reply->deleteLater();
-            return;
-        }
+                // Check if Firebase returned an error
+                if (json.contains("error")) {
+                    QString message =
+                        json["error"].toObject()["message"].toString();
 
-        QByteArray response = reply->readAll();
-        QJsonDocument resDoc = QJsonDocument::fromJson(response);
+                    qDebug() << "Login failed:" << message;
 
-        idToken = resDoc.object()["idToken"].toString();
+                    callback("", "");
+                }
+                else {
+                    QString token = json["idToken"].toString();
+                    QString uid = json["localId"].toString();
 
-        emit loginSuccess();
+                    callback(token, uid);
+                }
 
-        reply->deleteLater();
-    });
+                reply->deleteLater();
+            });
+}
+
+void AuthManager::registerUser(QString email, QString password,
+                               std::function<void(QString token, QString uid)> callback)
+{
+    QString url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key="
+        + apiKey;
+
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject body;
+    body["email"] = email;
+    body["password"] = password;
+    body["returnSecureToken"] = true;
+
+    QNetworkReply *reply =
+        networkManager.post(request, QJsonDocument(body).toJson());
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray response = reply->readAll();
+
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+                QJsonObject json = jsonDoc.object();
+
+                if (json.contains("error")) {
+                    QString message =
+                        json["error"].toObject()["message"].toString();
+
+                    qDebug() << "Registration failed:" << message;
+
+                    callback("", "");
+                }
+                else {
+                    QString token = json["idToken"].toString();
+                    QString uid = json["localId"].toString();
+
+                    callback(token, uid);
+                }
+
+                reply->deleteLater();
+            });
 }
