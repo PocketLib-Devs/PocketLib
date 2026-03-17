@@ -45,6 +45,8 @@ void MainWindow::on_loginButton_clicked()
                                    QMessageBox::warning(this, "Login Failed", "Invalid email or password");
                                    return;
                                }
+                               currentToken = token;
+                               currentUID   = uid;
 
                                // If login succeeded → check role from Firestore
                                firestoreClient->getUserRole(uid, token,
@@ -170,5 +172,38 @@ void MainWindow::on_back_btn_clicked()
 {
     if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+
+
+void MainWindow::on_addBook_btn_clicked()
+{
+    qDebug() << "Token being sent:" << currentToken.left(30) << "...";
+    qDebug() << "Token length:" << currentToken.length();
+
+    if (currentToken.isEmpty()) {
+        QMessageBox::warning(this, "Auth Error", "No token — please log in first.");
+        return;
+    }
+    Book book;
+    // book.id left empty → a UUID will be generated automatically
+    book.title       = ui->bookName_in->text();
+    book.author      = ui->author_in->text();
+    book.category    = ui->categ_in->text();
+    book.coverUrl    = ui->lineEdit_coverUrl->text();
+    book.description = ui->textEdit_description->toPlainText();
+    book.rating      = ui->doubleSpinBox_rating->value();
+    book.section     = ui->lineEdit_section->text();
+    book.available   = ui->checkBox->isChecked();
+
+    firestoreClient->addBook(book, currentToken,
+                            [this](QString docId)
+                            {
+                                if (docId.isEmpty()) {
+                                    QMessageBox::warning(this, "Error", "Failed to add book.");
+                                } else {
+                                    QMessageBox::information(this, "Success",
+                                                             "Book added! ID: " + docId);
+                                }
+                            });
 }
 

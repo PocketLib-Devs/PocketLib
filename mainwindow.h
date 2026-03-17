@@ -34,6 +34,8 @@ private slots:
 
     void on_back_btn_clicked();
 
+    void on_addBook_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
