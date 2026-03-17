@@ -40,9 +40,6 @@ signals:
 
     void deleteBook(QString documentId);
 
-signals:
-    void requestSuccess(QString message);
-    void requestError(QString error);
 
 private:
     // ── helpers ─────────────────────────────────────────────────────────────

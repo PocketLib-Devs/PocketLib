@@ -86,6 +86,8 @@ QJsonObject FirestoreClient::bookToFields(const Book &book) const
     fields["description"] = QJsonObject{ {"stringValue",  book.description} };
     fields["rating"]      = QJsonObject{ {"doubleValue",  book.rating}      };
     fields["section"]     = QJsonObject{ {"stringValue",  book.section}     };
+    return fields;
+}
 
 void FirestoreClient::deleteBook(QString documentId, QString idToken)
 {
@@ -197,7 +199,7 @@ void FirestoreClient::getFineAmount(QString uid, QString token, std::function<vo
         }
         reply->deleteLater();
     });
-    return fields;
+
 }
 
 /*
@@ -270,3 +272,4 @@ void FirestoreClient::addBook(const Book    &book,
                 reply->deleteLater();
             });
 }
+
