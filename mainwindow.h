@@ -16,6 +16,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void bookViewPage(QString bookTitle,
+                      QString author,
+                      QString category,
+                      QString rating,
+                      QString description);
 
 private slots:
 
@@ -33,6 +38,8 @@ private slots:
     void on_addBooks_btn_clicked();
 
     void on_back_btn_clicked();
+
+    void on_backButton_clicked();
 
 private:
     Ui::MainWindow *ui;

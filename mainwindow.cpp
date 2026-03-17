@@ -172,3 +172,22 @@ void MainWindow::on_back_btn_clicked()
     else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 
+
+void MainWindow::on_backButton_clicked()
+{
+     ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+void MainWindow::bookViewPage(QString title,
+                              QString author,
+                              QString category,
+                              QString rating,
+                              QString description)
+{
+    ui->bookTitleLabel->setText(title);
+    ui->bookAuthorLabel->setText(author);
+    ui->bookCategoryLabel->setText(category);
+    ui->bookRatingLabel->setText(rating);
+    ui->bookDescriptionText->setText(description);
+
+    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
+}
