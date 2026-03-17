@@ -17,10 +17,11 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        auth/AuthManager.cpp
-        auth/AuthManager.h
-        firestore/FirestoreClient.cpp
-        firestore/FirestoreClient.h
+	config.h
+    	auth/AuthManager.cpp
+    	auth/AuthManager.h
+    	firestore/FirestoreClient.cpp
+    	firestore/FirestoreClient.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

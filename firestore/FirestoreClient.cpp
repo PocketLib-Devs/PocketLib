@@ -71,3 +71,23 @@ void FirestoreClient::getUserRole(QString uid, QString token,
                 reply->deleteLater();
             });
 }
+
+void FirestoreClient::deleteBook(QString documentId)
+{
+    QNetworkRequest request(baseUrl + "books/" + documentId);
+
+    request.setRawHeader("Authorization",
+                         ("Bearer " + idToken).toUtf8());
+
+    QNetworkReply *reply = manager->deleteResource(request);
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+
+        if(reply->error())
+            emit requestError(reply->errorString());
+        else
+            emit requestSuccess("Book deleted");
+
+        reply->deleteLater();
+    });
+}
