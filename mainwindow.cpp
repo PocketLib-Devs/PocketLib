@@ -1,57 +1,26 @@
 #include "mainwindow.h"
-#include <QDebug>
+
 #include <QMessageBox>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
-#include "./ui_mainwindow.h"
+#include <QDebug>
+#include "ui_mainwindow.h"
+#include "config.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
+    
+
     ui->setupUi(this);
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("pocketlib.db");
 
-    if (!db.open()) {
-        qDebug() << "CRITICAL ERROR: Database failed to open!";
-        qDebug() << db.lastError().text();
-        return;
-    } else {
-        qDebug() << "SUCCESS: PocketLIB Database is online!";
-    }
+    // Start app at login screen
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+    // 1. Initialize Firebase Managers instead of SQLite
+    authManager = new AuthManager(this);
+    firestoreClient = new FirestoreClient(this);
+    ui->widget->hide();
 
-    // 2. Create the Tables based on the PocketLIB requirements
-    QSqlQuery query;
-
-    // Table 1: Users (Handles login, roles, and points)
-    query.exec("CREATE TABLE IF NOT EXISTS Users ("
-               "LibraryID TEXT PRIMARY KEY, "
-               "Password TEXT, "
-               "Role TEXT, "
-               "PointsBalance INTEGER DEFAULT 0)");
-
-    // Table 2: Books (Handles inventory) [cite: 24, 25, 26, 53, 54]
-    query.exec("CREATE TABLE IF NOT EXISTS Books ("
-               "BookID INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "Title TEXT, "
-               "Category TEXT, "
-               "Quantity INTEGER, "
-               "AvailableStatus TEXT)");
-
-    // Table 3: Transactions (Handles borrowing and fines) [cite: 30, 34, 35, 58, 65]
-    query.exec("CREATE TABLE IF NOT EXISTS Transactions ("
-               "LoanID INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "LibraryID TEXT, "
-               "BookID INTEGER, "
-               "DueDate TEXT, "
-               "FineAmount INTEGER DEFAULT 0)");
-
-    query.exec("INSERT OR IGNORE INTO Users (LibraryID, Password, Role) "
-               "VALUES ('Admin01', 'adminpass', 'Admin')");
-
-    query.exec("INSERT OR IGNORE INTO Users (LibraryID, Password, Role) "
-               "VALUES ('User01', 'userpass', 'Consumer')");
 }
 
 MainWindow::~MainWindow()
@@ -59,37 +28,185 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+//////////////////////////////////////////////////////////////
+// LOGIN
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_loginButton_clicked()
 {
-    // 1. Grab the text from the UI boxes
-    QString enteredID = ui->usernameBox->text();
-    QString enteredPassword = ui->passwordBox->text();
+    QString email = ui->loginEmail->text();
+    QString password = ui->loginPassword->text();
 
-    // 2. Ask the database if this user exists
-    QSqlQuery query;
-    // We use placeholders (:) to safely pass variables into SQL
-    query.prepare("SELECT Role FROM Users WHERE LibraryID = :id AND Password = :password");
-    query.bindValue(":id", enteredID);
-    query.bindValue(":password", enteredPassword);
+    authManager->loginUser(email, password,
+                           [this](QString token, QString uid)
+                           {
+                               // If login failed
+                               if (token.isEmpty()) {
+                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
+                                   return;
+                               }
 
-    // 3. Run the search
-    if (query.exec()) {
-        if (query.next()) {
-            // SUCCESS! The database found a matching row.
-            QString userRole = query.value(0).toString(); // Grab the 'Role' text
+                               // If login succeeded → check role from Firestore
+                               firestoreClient->getUserRole(uid, token,
+                                                            [this](QString role)
+                                                            {
+                                                                if (role == "admin") {
+                                                                    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+                                                                }
+                                                                else if (role == "student") {
+                                                                    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+                                                                }
+                                                            });
+                           });
+}
 
-            // 4. Route to the correct screen based on the Role
-            if (userRole == "Admin") {
-                ui->stackedWidget->setCurrentIndex(1); // Go to Admin Dashboard
-            } else if (userRole == "Consumer") {
-                ui->stackedWidget->setCurrentIndex(2); // Go to User Dashboard
-            }
+//////////////////////////////////////////////////////////////
+// REGISTER PAGE OPEN
+//////////////////////////////////////////////////////////////
 
-        } else {
-            // FAILED! No match was found.
-            QMessageBox::warning(this, "Login Failed", "Incorrect Library ID or Password.");
-        }
-    } else {
-        qDebug() << "Database query error!";
+void MainWindow::on_openRegisterButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
+}
+
+//////////////////////////////////////////////////////////////
+// BACK TO LOGIN
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_backToLoginButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+//////////////////////////////////////////////////////////////
+// REGISTER USER
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_registerButton_clicked()
+{
+    QString email = ui->registerEmail->text();
+    QString password = ui->registerPassword->text();
+
+    if(email.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this,"Error","Enter email and password");
+        return;
     }
+
+    authManager->registerUser(email, password,
+                      [this, email](QString token, QString uid)
+                      {
+                          // Create user record in Firestore
+                          firestoreClient->createUser(uid, email, "student", token);
+
+                          QMessageBox::information(this,"Success","Account created successfully!");
+
+                          ui->stackedWidget->setCurrentIndex(0);
+                      }
+                      );
+}
+
+//////////////////////////////////////////////////////////////
+// OPEN DASHBOARD BASED ON ROLE
+//////////////////////////////////////////////////////////////
+
+void MainWindow::openDashboard(QString role)
+{
+    if(role == "admin")
+    {
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    }
+    else
+    {
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+    }
+}
+
+//////////////////////////////////////////////////////////////
+// LOGOUT (STUDENT)
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_logoutStudent_clicked()
+{
+    currentToken.clear();
+    currentUID.clear();
+
+    ui->loginEmail->clear();
+    ui->loginPassword->clear();
+
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+//////////////////////////////////////////////////////////////
+// LOGOUT (ADMIN)
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_logoutAdmin_clicked()
+{
+    currentToken.clear();
+    currentUID.clear();
+
+    ui->loginEmail->clear();
+    ui->loginPassword->clear();
+
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+}
+
+void MainWindow::on_sidebar_btn_clicked()
+{
+    bool isSidebarVisible = ui->widget->isVisible();
+    if(!isSidebarVisible) ui->widget->setVisible(true);
+    else ui->widget->setVisible(false);
+}
+
+
+void MainWindow::on_addBooks_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+}
+
+
+void MainWindow::on_back_btn_clicked()
+{
+    if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+
+
+// This function is triggered when the "Back" button on the Book View Page is clicked.
+// It switches the stackedWidget back to the student dashboard page.
+void MainWindow::on_backButton_clicked()
+{
+    // stackedWidget contains all the pages of the application.
+    // setCurrentWidget() changes the visible page.
+    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+
+
+// This function is responsible for opening the Book View Page
+// and filling it with the details of the selected book.
+void MainWindow::bookViewPage(QString title,
+                              QString author,
+                              QString category,
+                              QString rating,
+                              QString description)
+{
+    // Set the book title label with the title passed to the function
+    ui->bookTitleLabel->setText(title);
+
+    // Set the author label
+    ui->bookAuthorLabel->setText(author);
+
+    // Set the category label
+    ui->bookCategoryLabel->setText(category);
+
+    // Set the rating label
+    ui->bookRatingLabel->setText(rating);
+
+    // Set the book description text box
+    ui->bookDescriptionText->setText(description);
+
+    // Change the current visible page of the stackedWidget
+    // to the Book View Page so the user can see the details
+    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 }

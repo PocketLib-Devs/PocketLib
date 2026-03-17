@@ -2,11 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "auth/AuthManager.h"
+#include "firestore/FirestoreClient.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -16,11 +16,41 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void bookViewPage(QString bookTitle,
+                      QString author,
+                      QString category,
+                      QString rating,
+                      QString description);
 
 private slots:
-    void on_pushButton_clicked();
+
+    void on_loginButton_clicked();
+    void on_openRegisterButton_clicked();
+    void on_registerButton_clicked();
+    void on_backToLoginButton_clicked();
+
+    void on_logoutStudent_clicked();
+    void on_logoutAdmin_clicked();
+
+
+    void on_sidebar_btn_clicked();
+
+    void on_addBooks_btn_clicked();
+
+    void on_back_btn_clicked();
+
+    void on_backButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    AuthManager *authManager;
+    FirestoreClient *firestoreClient;
+
+    QString currentToken;
+    QString currentUID;
+
+    void openDashboard(QString role);
 };
-#endif // MAINWINDOW_H
+
+#endif
