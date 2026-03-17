@@ -17,8 +17,17 @@ public:
     void getUserRole(QString uid, QString token,
                      std::function<void(QString role)> callback);
 
+    void deleteBook(QString documentId);
+
+signals:
+    void requestSuccess(QString message);
+    void requestError(QString error);
+
 private:
     QNetworkAccessManager networkManager;
+
+    QString baseUrl;
+    QString idToken;
 
     const QString projectId = "pocketlib-ea41d";
 };

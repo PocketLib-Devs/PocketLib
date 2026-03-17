@@ -79,7 +79,7 @@ void FirestoreClient::deleteBook(QString documentId)
     request.setRawHeader("Authorization",
                          ("Bearer " + idToken).toUtf8());
 
-    QNetworkReply *reply = manager->deleteResource(request);
+    QNetworkReply *reply = networkManager.deleteResource(request);
 
     connect(reply, &QNetworkReply::finished, [=]() {
 
