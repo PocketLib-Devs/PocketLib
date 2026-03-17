@@ -37,6 +37,8 @@ private slots:
     void on_backFromMonitoring_btn_clicked();
     void on_notificationBell_clicked();
 
+    void on_addBook_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
