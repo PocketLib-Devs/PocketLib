@@ -4,6 +4,9 @@
 #include <QDebug>
 #include "ui_mainwindow.h"
 #include "config.h"
+#include <QProgressDialog>
+#include <QThread>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,24 +43,28 @@ void MainWindow::on_loginButton_clicked()
     authManager->loginUser(email, password,
                            [this](QString token, QString uid)
                            {
-                               // If login failed
+
+                               this->currentToken = token;
+                               this->currentUID = uid;
+
                                if (token.isEmpty()) {
                                    QMessageBox::warning(this, "Login Failed", "Invalid email or password");
                                    return;
                                }
+                               currentToken = token;
+                               currentUID   = uid;
 
-                               // If login succeeded → check role from Firestore
-                               firestoreClient->getUserRole(uid, token,
-                                                            [this](QString role)
-                                                            {
-                                                                if (role == "admin") {
-                                                                    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
-                                                                }
-                                                                else if (role == "student") {
-                                                                    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
-                                                                }
-                                                            });
-                           });
+                               firestoreClient->getUserRole(uid, token, [this](QString role) {
+                                   if (role == "admin") {
+                                       ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+                                   }
+                                   else if (role == "student") {
+                                       ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+                                       checkStudentFines(); // Triggers the bell check
+                                   }
+                               });
+                           }
+                           );
 }
 
 //////////////////////////////////////////////////////////////
@@ -170,6 +177,159 @@ void MainWindow::on_back_btn_clicked()
 {
     if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+}
+//////////////////////////////////////////////////////////////
+// OPEN USER MONITORING PAGE
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_userMonitoring_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->userMonitoringPage);
+
+
+        // Fetch the books and send them to the table!
+        firestoreClient->fetchBorrowedBooks(currentToken, [this](QJsonArray books) {
+            populateMonitoringTable(books);
+        });
+    }
+
+
+//////////////////////////////////////////////////////////////
+// BACK FROM USER MONITORING
+//////////////////////////////////////////////////////////////
+
+void MainWindow::on_backFromMonitoring_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+}
+
+void MainWindow::on_notificationBell_clicked()
+{
+    firestoreClient->getFineAmount(currentUID, currentToken, [this](int fine) {
+        if (fine > 0) {
+            processMockPayment(fine); // This is the simulation we wrote earlier
+        } else {
+            QMessageBox::information(this, "Notifications", "Your library record is clear!");
+        }
+    });
+}
+
+void MainWindow::populateMonitoringTable(QJsonArray books)
+{
+    ui->monitoringTable->setRowCount(0);
+
+    for (int i = 0; i < books.size(); ++i) {
+        QJsonObject fields = books[i].toObject().value("fields").toObject();
+
+        // Extracting data (ensure these keys match your Firestore names)
+        QString userUID = fields.value("userUID").toObject().value("stringValue").toString();
+        QString userName = fields.value("userName").toObject().value("stringValue").toString();
+        QString bookName = fields.value("bookName").toObject().value("stringValue").toString();
+        QString borrowDate = fields.value("borrowDate").toObject().value("stringValue").toString();
+        QString returnDate = fields.value("dueDate").toObject().value("stringValue").toString();
+
+        int row = ui->monitoringTable->rowCount();
+        ui->monitoringTable->insertRow(row);
+
+        // Fill 6 columns (Indices 0 to 5)
+        ui->monitoringTable->setItem(row, 0, new QTableWidgetItem(QString::number(i + 1))); // Sr. No.
+        ui->monitoringTable->setItem(row, 1, new QTableWidgetItem(userName));
+        ui->monitoringTable->setItem(row, 2, new QTableWidgetItem(bookName));
+        ui->monitoringTable->setItem(row, 3, new QTableWidgetItem(borrowDate));
+        ui->monitoringTable->setItem(row, 4, new QTableWidgetItem(returnDate));
+
+        QPushButton *fineBtn = new QPushButton("Impose Fine");
+
+        // Logic check: Is it overdue?
+        QDate dueDate = QDate::fromString(returnDate, Qt::ISODate);
+        if (QDate::currentDate() > dueDate) {
+            fineBtn->setEnabled(true);
+            fineBtn->setStyleSheet("background-color: #dc3545; color: white;");
+        } else {
+            fineBtn->setEnabled(false);
+        }
+
+        // Connect button to the NEW Firestore function
+        connect(fineBtn, &QPushButton::clicked, [=]() {
+            int fineValue = 50; // Set your standard fine amount
+            firestoreClient->updateFineInFirestore(userUID, fineValue, authManager->getCurrentToken());
+            QMessageBox::information(this, "Action Taken", "Fine of ₹" + QString::number(fineValue) + " imposed.");
+        });
+
+        ui->monitoringTable->setCellWidget(row, 5, fineBtn); // Column 5 is "Action"
+    }
+}
+void MainWindow::checkStudentFines()
+{
+    // Use the current UID and Token stored during login
+    firestoreClient->getFineAmount(currentUID, currentToken, [this](int fine) {
+        if (fine > 0) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Library Notification");
+            msgBox.setText("<b>Penalty Alert!</b>");
+            msgBox.setInformativeText("You have a pending fine of ₹" + QString::number(fine) +
+                                      " for an overdue book.");
+            msgBox.setIcon(QMessageBox::Warning);
+
+            QPushButton *payBtn = msgBox.addButton("Pay Fine (Simulation)", QMessageBox::ActionRole);
+            msgBox.addButton("Close", QMessageBox::RejectRole);
+
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == payBtn) {
+                processMockPayment(fine);
+            }
+        }
+    });
+}
+void MainWindow::processMockPayment(int amount)
+{
+    // 1. Show a fake processing dialog
+    QProgressDialog progress("Connecting to Razorpay...", "Cancel", 0, 100, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.show();
+
+    // Simulate a 2-second delay
+    QThread::msleep(2000);
+    progress.setValue(100);
+
+    // 2. Tell Firebase the fine is cleared!
+    firestoreClient->updateFineInFirestore(currentUID, 0, currentToken);
+
+    QMessageBox::information(this, "Payment Successful", "₹" + QString::number(amount) +
+                                                             " paid successfully. Your record is now clear.");
+}
+
+void MainWindow::on_addBook_btn_clicked()
+{
+    qDebug() << "Token being sent:" << currentToken.left(30) << "...";
+    qDebug() << "Token length:" << currentToken.length();
+
+    if (currentToken.isEmpty()) {
+        QMessageBox::warning(this, "Auth Error", "No token — please log in first.");
+        return;
+    }
+    Book book;
+    // book.id left empty → a UUID will be generated automatically
+    book.title       = ui->bookName_in->text();
+    book.author      = ui->author_in->text();
+    book.category    = ui->categ_in->text();
+    book.coverUrl    = ui->lineEdit_coverUrl->text();
+    book.description = ui->textEdit_description->toPlainText();
+    book.rating      = ui->doubleSpinBox_rating->value();
+    book.section     = ui->lineEdit_section->text();
+    book.available   = ui->checkBox->isChecked();
+
+    firestoreClient->addBook(book, currentToken,
+                            [this](QString docId)
+                            {
+                                if (docId.isEmpty()) {
+                                    QMessageBox::warning(this, "Error", "Failed to add book.");
+                                } else {
+                                    QMessageBox::information(this, "Success",
+                                                             "Book added! ID: " + docId);
+                                }
+                            });
 }
 
 

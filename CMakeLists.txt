@@ -28,6 +28,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(PocketLibApp
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+
+
+        firestore/Book.h
     )
 else()
     if(ANDROID)
