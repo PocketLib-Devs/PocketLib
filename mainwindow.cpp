@@ -174,7 +174,7 @@ void MainWindow::on_back_btn_clicked()
     else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 
-
+//example
 void MainWindow::on_addBook_btn_clicked()
 {
     qDebug() << "Token being sent:" << currentToken.left(30) << "...";
@@ -206,4 +206,3 @@ void MainWindow::on_addBook_btn_clicked()
                                 }
                             });
 }
-
