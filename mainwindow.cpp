@@ -173,21 +173,40 @@ void MainWindow::on_back_btn_clicked()
 }
 
 
+// This function is triggered when the "Back" button on the Book View Page is clicked.
+// It switches the stackedWidget back to the student dashboard page.
 void MainWindow::on_backButton_clicked()
 {
-     ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+    // stackedWidget contains all the pages of the application.
+    // setCurrentWidget() changes the visible page.
+    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
+
+
+// This function is responsible for opening the Book View Page
+// and filling it with the details of the selected book.
 void MainWindow::bookViewPage(QString title,
                               QString author,
                               QString category,
                               QString rating,
                               QString description)
 {
+    // Set the book title label with the title passed to the function
     ui->bookTitleLabel->setText(title);
+
+    // Set the author label
     ui->bookAuthorLabel->setText(author);
+
+    // Set the category label
     ui->bookCategoryLabel->setText(category);
+
+    // Set the rating label
     ui->bookRatingLabel->setText(rating);
+
+    // Set the book description text box
     ui->bookDescriptionText->setText(description);
 
+    // Change the current visible page of the stackedWidget
+    // to the Book View Page so the user can see the details
     ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 }
