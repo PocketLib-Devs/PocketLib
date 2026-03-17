@@ -38,6 +38,12 @@ signals:
     void requestError(QString errorMessage);
     void requestSuccess(QString successMessage);
 
+    void deleteBook(QString documentId);
+
+signals:
+    void requestSuccess(QString message);
+    void requestError(QString error);
+
 private:
     // ── helpers ─────────────────────────────────────────────────────────────
     /** Converts a Book struct → Firestore REST "fields" JSON object. */
@@ -47,6 +53,9 @@ private:
     Book        fieldsToBook(const QString &docName,
                       const QJsonObject &fields) const;
     QNetworkAccessManager networkManager;
+
+    QString baseUrl;
+    QString idToken;
 
     const QString projectId = "pocketlib-ea41d";
     QString booksBaseUrl() const
