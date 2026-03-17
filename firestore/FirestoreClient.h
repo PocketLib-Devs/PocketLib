@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <functional>
+#include <QJsonArray>
 #include <QList>
 #include "Book.h"
 
@@ -21,6 +22,21 @@ public:
     void addBook(const Book &book, const QString &token,
                  std::function<void(QString docId)> callback);
 
+
+    //delete book function
+    void deleteBook(QString documentId, QString idToken);
+
+
+
+    void fetchBorrowedBooks(QString token, std::function<void(QJsonArray)> callback);
+
+    void updateFineInFirestore(QString uid, int fineAmount, QString token);
+
+    void getFineAmount(QString uid, QString token, std::function<void(int)> callback);
+
+signals:
+    void requestError(QString errorMessage);
+    void requestSuccess(QString successMessage);
 
 private:
     // ── helpers ─────────────────────────────────────────────────────────────

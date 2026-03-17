@@ -18,11 +18,16 @@ public:
 
     void registerUser(QString email, QString password,
                       std::function<void(QString token, QString uid)> callback);
+    QString getCurrentToken() const { return m_token; }
 
 private:
     QNetworkAccessManager networkManager;
 
     const QString apiKey = "AIzaSyDd4x5PuwJi8Coi4ii6o93QbcYeBr_ArIg";
+
+
+    // ADD THIS LINE HERE:
+    QString m_token;
 };
 
 #endif

@@ -241,6 +241,19 @@ QPushButton:pressed {
          <string>Logout</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="notificationBell">
+        <property name="geometry">
+         <rect>
+          <x>712</x>
+          <y>10</y>
+          <width>51</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="adminDashboardPage">
        <widget class="QPushButton" name="sidebar_btn">
@@ -254,19 +267,6 @@ QPushButton:pressed {
         </property>
         <property name="text">
          <string/>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="geometry">
-         <rect>
-          <x>727</x>
-          <y>0</y>
-          <width>41</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PushButton</string>
         </property>
        </widget>
        <widget class="QWidget" name="gridLayoutWidget">
@@ -301,7 +301,7 @@ QPushButton:pressed {
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="userMonitoring_btn">
            <property name="text">
             <string>User Monitoring</string>
            </property>
@@ -412,7 +412,65 @@ QPushButton:pressed {
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="sample_page"/>
+      <widget class="QWidget" name="userMonitoringPage">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QPushButton" name="backFromMonitoring_btn">
+          <property name="text">
+           <string>Back to Dashboard</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI Variable</family>
+            <pointsize>14</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>User Monitoring &amp; Fines</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="monitoringTable">
+          <column>
+           <property name="text">
+            <string>Sr. No.</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>User Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Book Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Borrow Date</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Return Date</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Action</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="addRemove_page">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="0">
