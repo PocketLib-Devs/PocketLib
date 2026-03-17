@@ -28,7 +28,7 @@ void AuthManager::loginUser(QString email, QString password,
     QNetworkReply *reply =
         networkManager.post(request, QJsonDocument(body).toJson());
 
-    connect(reply, &QNetworkReply::finished, [reply, callback]()
+    connect(reply, &QNetworkReply::finished, [this, reply, callback]()
             {
                 QByteArray response = reply->readAll();
 
@@ -47,7 +47,7 @@ void AuthManager::loginUser(QString email, QString password,
                 else {
                     QString token = json["idToken"].toString();
                     QString uid = json["localId"].toString();
-
+                    this->m_token = token;
                     callback(token, uid);
                 }
 
@@ -73,7 +73,7 @@ void AuthManager::registerUser(QString email, QString password,
     QNetworkReply *reply =
         networkManager.post(request, QJsonDocument(body).toJson());
 
-    connect(reply, &QNetworkReply::finished, [reply, callback]()
+    connect(reply, &QNetworkReply::finished, [this, reply, callback]()
             {
                 QByteArray response = reply->readAll();
 
@@ -91,7 +91,7 @@ void AuthManager::registerUser(QString email, QString password,
                 else {
                     QString token = json["idToken"].toString();
                     QString uid = json["localId"].toString();
-
+                    this->m_token = token;
                     callback(token, uid);
                 }
 

@@ -33,6 +33,9 @@ private slots:
     void on_addBooks_btn_clicked();
 
     void on_back_btn_clicked();
+    void on_userMonitoring_btn_clicked();
+    void on_backFromMonitoring_btn_clicked();
+    void on_notificationBell_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -42,8 +45,11 @@ private:
 
     QString currentToken;
     QString currentUID;
-
+    void populateMonitoringTable(QJsonArray books);
     void openDashboard(QString role);
+    void checkStudentFines();
+    void processMockPayment(int amount);
+
 };
 
 #endif
