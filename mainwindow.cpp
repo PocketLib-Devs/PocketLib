@@ -65,10 +65,13 @@ firestoreClient->getUserRole(uid, token, [this](QString role)
         ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
         checkStudentFines(); // Triggers the bell check
     }
-    currentRole = role;
-});
+            currentRole = role;
+        }); // This closes the firestoreClient->getUserRole callback (Line 69)
+    }); // ADD THIS to close the authManager->loginUser callback
+}   // ADD THIS to close the void MainWindow::on_loginButton_clicked() function
 
-//////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+// REGISTER PAGE OPEN
 // REGISTER PAGE OPEN
 //////////////////////////////////////////////////////////////
 

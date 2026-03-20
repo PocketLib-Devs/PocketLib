@@ -20,56 +20,57 @@
    <property name="styleSheet">
     <string notr="true">/* --- Main Background --- */
 QWidget {
-    background-color: #F8F9FA; /* A very soft, clean light gray */
+    background-color: #F8F9FA;
 }
-
-/* --- Labels (Username &amp; Password) --- */
 QLabel {
-    color: #2C3E50; /* A dark, professional slate gray */
+    color: #2C3E50;
 }
-
-/* --- Text Input Fields (QLineEdit) --- */
 QLineEdit {
     background-color: #FFFFFF;
-    border: 2px solid #DCE1E6; /* Soft gray border */
-    border-radius: 5px; /* Subtle rounded corners */
+    border: 2px solid #DCE1E6;
+    border-radius: 5px;
     color: #333333;
-    padding: 2px 6px; /* Just enough internal space so text doesn't touch the line */
+    padding: 2px 6px;
 }
-
-/* Highlight the box in blue when the user is actively typing */
 QLineEdit:focus {
-    border: 2px solid #007BFF; 
-    background-color: #F0F7FF; /* Very faint blue tint */
+    border: 2px solid #007BFF;
+    background-color: #F0F7FF;
 }
-
-/* --- The Login Button (QPushButton) --- */
 QPushButton {
-    background-color: #007BFF; /* Primary vibrant blue */
+    background-color: #007BFF;
     color: #FFFFFF;
     border: none;
     border-radius: 5px;
-    padding: 6px 12px; /* Internal padding only, does not affect outside layout */
+    padding: 6px 12px;
 }
-
-/* When the mouse hovers over the button */
 QPushButton:hover {
-    background-color: #0056B3; /* Darker blue */
+    background-color: #0056B3;
 }
-
-/* When the button is actively clicked */
 QPushButton:pressed {
-    background-color: #004085; /* Deepest blue */
+    background-color: #004085;
 }</string>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="loginPage">
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="appLabel">
           <property name="font">
@@ -85,18 +86,8 @@ QPushButton:pressed {
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="loginPassword">
-          <property name="echoMode">
-           <enum>QLineEdit::EchoMode::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_3">
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -115,6 +106,16 @@ QPushButton:pressed {
           </property>
          </widget>
         </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="loginPassword">
+          <property name="echoMode">
+           <enum>QLineEdit::EchoMode::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Enter Password</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="1">
          <widget class="QPushButton" name="loginButton">
           <property name="text">
@@ -129,40 +130,10 @@ QPushButton:pressed {
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="registerPage">
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="4" column="1">
-         <widget class="QPushButton" name="backToLoginButton">
-          <property name="text">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="registerPassword">
-          <property name="echoMode">
-           <enum>QLineEdit::EchoMode::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Password</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0">
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -176,30 +147,6 @@ QPushButton:pressed {
           </property>
          </spacer>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="registerEmail">
-          <property name="placeholderText">
-           <string>Email</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="registerButton">
-          <property name="text">
-           <string>Register</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="registerName">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>Full Name</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="2">
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
@@ -212,6 +159,47 @@ QPushButton:pressed {
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="registerName">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="placeholderText">
+           <string>Full Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="registerEmail">
+          <property name="placeholderText">
+           <string>Email</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="registerPassword">
+          <property name="echoMode">
+           <enum>QLineEdit::EchoMode::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="registerButton">
+          <property name="text">
+           <string>Register</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QPushButton" name="backToLoginButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -242,185 +230,24 @@ QPushButton:pressed {
          <string>Logout</string>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="adminDashboardPage">
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="search_btn">
-          <property name="text">
-           <string>Search</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="7">
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="2">
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Borrow/extension request</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="addBooks_btn">
-            <property name="text">
-             <string>Add/Remove Books</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="inventory_btn">
-            <property name="text">
-             <string>Inventory</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="text">
-             <string>User Monitoring</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" rowspan="2">
-           <widget class="QWidget" name="widget" native="true">
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
-               <item>
-                <widget class="QLabel" name="label_3">
-                 <property name="text">
-                  <string>My Profile</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="profile_btn">
-                 <property name="text">
-                  <string>My Profile</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="myBooks_btn">
-                 <property name="text">
-                  <string>My Books</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="history_btn">
-                 <property name="text">
-                  <string>My borrow history</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="transaction_btn">
-                 <property name="text">
-                  <string>My transaction history</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="help_btn">
-                 <property name="text">
-                  <string>Need Help</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="about_btn">
-                 <property name="text">
-                  <string>About us</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="logoutAdmin">
-                 <property name="text">
-                  <string>Logout</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="verticalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="sidebar_btn">
-          <property name="text">
-           <string>Side Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QPushButton" name="notification_btn">
-          <property name="text">
-           <string>Notifications</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="notificationBell">
+        <property name="geometry">
+         <rect>
+          <x>750</x>
+          <y>0</y>
+          <width>41</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="profile_page">
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_profile_left">
           <item>
            <widget class="QLabel" name="label_8">
             <property name="minimumSize">
@@ -502,7 +329,7 @@ QPushButton:pressed {
          </layout>
         </item>
         <item row="0" column="2">
-         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <layout class="QVBoxLayout" name="verticalLayout_profile_right">
           <item>
            <widget class="QLineEdit" name="changename_in"/>
           </item>
@@ -547,6 +374,19 @@ QPushButton:pressed {
            </spacer>
           </item>
           <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="borrowhis_btn">
             <property name="text">
              <string>My Borrow History</string>
@@ -575,58 +415,6 @@ QPushButton:pressed {
             </property>
             <property name="text">
              <string>TextLabel</string>
-       <widget class="QPushButton" name="notificationBell">
-        <property name="geometry">
-         <rect>
-          <x>850</x>
-          <y>10</y>
-          <width>41</width>
-          <height>29</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="bookViewPage">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QWidget" name="bookDetails" native="true">
-          <widget class="QWidget" name="bookImage" native="true">
-           <property name="geometry">
-            <rect>
-             <x>-20</x>
-             <y>0</y>
-             <width>331</width>
-             <height>495</height>
-            </rect>
-           </property>
-           <widget class="QLabel" name="bookImage_label">
-            <property name="geometry">
-             <rect>
-              <x>50</x>
-              <y>70</y>
-              <width>250</width>
-              <height>350</height>
-             </rect>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>250</width>
-              <height>350</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>16</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string> BOOK IMAGE</string>
-            </property>
-            <property name="scaledContents">
-             <bool>true</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -655,126 +443,158 @@ QPushButton:pressed {
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="bookViewPage">
+       <widget class="QWidget" name="bookDetails" native="true">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>309</width>
+          <height>560</height>
+         </rect>
+        </property>
+        <widget class="QWidget" name="bookImage" native="true">
+         <property name="geometry">
+          <rect>
+           <x>-20</x>
+           <y>0</y>
+           <width>331</width>
+           <height>495</height>
+          </rect>
+         </property>
+         <widget class="QLabel" name="bookImage_label">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>70</y>
+            <width>250</width>
+            <height>350</height>
+           </rect>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
+          <property name="minimumSize">
            <size>
-            <width>20</width>
-            <height>10</height>
+            <width>250</width>
+            <height>350</height>
            </size>
           </property>
-         </spacer>
-        </item>
-       </layout>
-          </widget>
-          <widget class="QWidget" name="verticalLayoutWidget">
-           <property name="geometry">
-            <rect>
-             <x>309</x>
-             <y>9</y>
-             <width>581</width>
-             <height>481</height>
-            </rect>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QLabel" name="bookTitleLabel">
-              <property name="font">
-               <font>
-                <pointsize>18</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>BOOK TITLE</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTextEdit" name="bookDescriptionText">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bookAuthorLabel">
-              <property name="font">
-               <font>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>AUTHOR</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bookCategoryLabel">
-              <property name="font">
-               <font>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>CATEGORY</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bookRatingLabel">
-              <property name="font">
-               <font>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>BOOK RATING</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="availabilityLabel">
-              <property name="text">
-               <string>AVAILABILITY</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="borrowButton">
-              <property name="text">
-               <string>BORROW</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="addToMyBooksButton">
-              <property name="text">
-               <string>ADD TO MY BOOKS</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="backButton">
-              <property name="text">
-               <string>BACK</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string> BOOK IMAGE</string>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
          </widget>
-        </item>
-       </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>309</x>
+          <y>9</y>
+          <width>481</width>
+          <height>481</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_bookview">
+         <item>
+          <widget class="QLabel" name="bookTitleLabel">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>BOOK TITLE</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="bookDescriptionText">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="bookAuthorLabel">
+           <property name="font">
+            <font>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>AUTHOR</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="bookCategoryLabel">
+           <property name="font">
+            <font>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>CATEGORY</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="bookRatingLabel">
+           <property name="font">
+            <font>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>BOOK RATING</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="availabilityLabel">
+           <property name="text">
+            <string>AVAILABILITY</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="borrowButton">
+           <property name="text">
+            <string>BORROW</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addToMyBooksButton">
+           <property name="text">
+            <string>ADD TO MY BOOKS</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="backButton">
+           <property name="text">
+            <string>BACK</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="adminDashboardPage">
        <widget class="QPushButton" name="sidebar_btn">
@@ -800,34 +620,6 @@ QPushButton:pressed {
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="1" column="2">
-          <widget class="QPushButton" name="pushButton">
-           <property name="text">
-            <string>Borrow/extension request</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="addBooks_btn">
-           <property name="text">
-            <string>Add/Remove Books</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="inventory_btn">
-           <property name="text">
-            <string>Inventory</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="userMonitoring_btn">
-           <property name="text">
-            <string>User Monitoring</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0" rowspan="2">
           <widget class="QWidget" name="widget" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -917,6 +709,34 @@ QPushButton:pressed {
            </layout>
           </widget>
          </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="addBooks_btn">
+           <property name="text">
+            <string>Add/Remove Books</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="inventory_btn">
+           <property name="text">
+            <string>Inventory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="userMonitoring_btn">
+           <property name="text">
+            <string>User Monitoring</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Borrow/extension request</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QPushButton" name="search_btn">
@@ -934,7 +754,7 @@ QPushButton:pressed {
        </widget>
       </widget>
       <widget class="QWidget" name="userMonitoringPage">
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_monitoring">
         <item>
          <widget class="QPushButton" name="backFromMonitoring_btn">
           <property name="text">
@@ -943,7 +763,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="monitoringTitle">
           <property name="font">
            <font>
             <family>Segoe UI Variable</family>
@@ -994,20 +814,6 @@ QPushButton:pressed {
       </widget>
       <widget class="QWidget" name="addRemove_page">
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="1" column="0">
-         <widget class="QPushButton" name="addBook_btn">
-          <property name="text">
-           <string>ADD</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="back_btn">
-          <property name="text">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0" colspan="3">
          <layout class="QFormLayout" name="formLayout">
           <item row="0" column="0">
@@ -1022,17 +828,8 @@ QPushButton:pressed {
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="avlCopies">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Availability</string>
-            </property>
-           </widget>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="bookName_in"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="authorName">
@@ -1049,26 +846,20 @@ QPushButton:pressed {
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="category">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="author_in"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="avlCopies">
             <property name="font">
              <font>
               <pointsize>15</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Category</string>
+             <string>Availability</string>
             </property>
            </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="bookName_in"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="author_in"/>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="categ_in"/>
           </item>
           <item row="2" column="1">
            <widget class="QCheckBox" name="checkBox">
@@ -1087,6 +878,21 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="category">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Category</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="categ_in"/>
+          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="coverUrl">
             <property name="font">
@@ -1096,6 +902,33 @@ border: 1px solid gray;</string>
             </property>
             <property name="text">
              <string>Cover URL</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEdit_coverUrl"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="rating">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Rating</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_rating">
+            <property name="styleSheet">
+             <string notr="true">background-color: white;
+color: black;
+border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
@@ -1114,6 +947,15 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
+          <item row="6" column="1">
+           <widget class="QTextEdit" name="textEdit_description">
+            <property name="styleSheet">
+             <string notr="true">background-color: white;
+color: black;
+border: 1px solid gray;</string>
+            </property>
+           </widget>
+          </item>
           <item row="7" column="0">
            <widget class="QLabel" name="section">
             <property name="font">
@@ -1126,51 +968,29 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="rating">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Rating</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QTextEdit" name="textEdit_description">
-            <property name="styleSheet">
-             <string notr="true">background-color: white;
-color: black;
-border: 1px solid gray;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_rating">
-            <property name="styleSheet">
-             <string notr="true">background-color: white;
-color: black;
-border: 1px solid gray;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="lineEdit_coverUrl"/>
-          </item>
           <item row="7" column="1">
            <widget class="QLineEdit" name="lineEdit_section"/>
           </item>
          </layout>
         </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="addBook_btn">
+          <property name="text">
+           <string>ADD</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="remove_btn">
           <property name="text">
            <string>REMOVE</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="back_btn">
+          <property name="text">
+           <string>Back</string>
           </property>
          </widget>
         </item>
@@ -1186,7 +1006,7 @@ border: 1px solid gray;</string>
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
