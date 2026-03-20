@@ -24,6 +24,8 @@ public:
 
 private slots:
 
+    void handleSharedAction();
+
     void on_loginButton_clicked();
     void on_openRegisterButton_clicked();
     void on_registerButton_clicked();
@@ -44,10 +46,16 @@ private slots:
 
     void on_addBook_btn_clicked();
 
+    void on_profile_btn_clicked();
+
+    void on_change_name_btn_clicked();
     void on_backButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    QString currentUserName;
+    QString currentRole;
 
     AuthManager *authManager;
     FirestoreClient *firestoreClient;

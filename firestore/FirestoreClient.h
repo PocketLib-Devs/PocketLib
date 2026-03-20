@@ -1,12 +1,14 @@
 #ifndef FIRESTORECLIENT_H
 #define FIRESTORECLIENT_H
 
+
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <functional>
 #include <QJsonArray>
 #include <QList>
 #include "Book.h"
+#include "UserInfo.h"
 
 class FirestoreClient : public QObject
 {
@@ -14,13 +16,30 @@ class FirestoreClient : public QObject
 
 public:
     explicit FirestoreClient(QObject *parent = nullptr);
+    
+    void createUser(const UserInfo &user, const QString &token);
 
-    void createUser(QString uid, QString email, QString role, QString token);
 
     void getUserRole(QString uid, QString token,
                      std::function<void(QString role)> callback);
+
+    void getUserInfo(const QString &uid, const QString &token,
+                     std::function<void(UserInfo userInfo)> callback);
+
     void addBook(const Book &book, const QString &token,
                  std::function<void(QString docId)> callback);
+
+    void generateUniqueLibraryId(const QString &name, const QString &token,
+                                 std::function<void(QString libraryId)> callback);
+
+    void updateFineAmount(const QString &uid, int amount, const QString &token,
+                          std::function<void(bool success)> callback);
+
+    void updateUserName(const QString &uid,
+                        const QString &newName,
+                        const QString &token,
+                        std::function<void(bool success)> callback);
+
 
 
     //delete book function
@@ -42,13 +61,19 @@ signals:
 
 
 private:
-    // ── helpers ─────────────────────────────────────────────────────────────
-    /** Converts a Book struct → Firestore REST "fields" JSON object. */
+
     QJsonObject bookToFields(const Book &book) const;
 
-    /** Converts a Firestore REST "fields" JSON object → Book struct. */
     Book        fieldsToBook(const QString &docName,
                       const QJsonObject &fields) const;
+
+    QString     buildCandidateId(const QString &name) const;
+    void        checkLibraryIdExists(const QString &candidateId,
+                              const QString &token,
+                              std::function<void(bool exists)> callback);
+    void        tryGenerateId(const QString &name, const QString &token,
+                       int attemptsLeft,
+                       std::function<void(QString)> callback);
     QNetworkAccessManager networkManager;
 
     QString baseUrl;
@@ -60,6 +85,16 @@ private:
         return "https://firestore.googleapis.com/v1/projects/"
                + projectId
                + "/databases/(default)/documents/books";
+    }
+    QString usersBaseUrl() const
+    {
+        return "https://firestore.googleapis.com/v1/projects/"
+               + projectId + "/databases/(default)/documents/users";
+    }
+    QString runQueryUrl() const
+    {
+        return "https://firestore.googleapis.com/v1/projects/"
+               + projectId + "/databases/(default)/documents:runQuery";
     }
 };
 

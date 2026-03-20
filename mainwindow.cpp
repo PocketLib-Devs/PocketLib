@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
     
 
     ui->setupUi(this);
+    connect(ui->back_btn, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
+    connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     // Start app at login screen
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
@@ -54,18 +56,17 @@ void MainWindow::on_loginButton_clicked()
                                currentToken = token;
                                currentUID   = uid;
 
-                               firestoreClient->getUserRole(uid, token, [this](QString role) {
-                                   if (role == "admin") {
-                                       ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
-                                   }
-                                   else if (role == "student") {
-                                       ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
-                                       checkStudentFines(); // Triggers the bell check
-                                   }
-                               });
-                           }
-                           );
-}
+firestoreClient->getUserRole(uid, token, [this](QString role) 
+{
+    if (role == "admin") {
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    }
+    else if (role == "student") {
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+        checkStudentFines(); // Triggers the bell check
+    }
+    currentRole = role;
+});
 
 //////////////////////////////////////////////////////////////
 // REGISTER PAGE OPEN
@@ -93,6 +94,12 @@ void MainWindow::on_registerButton_clicked()
 {
     QString email = ui->registerEmail->text();
     QString password = ui->registerPassword->text();
+    QString name     = ui->registerName->text();
+
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "Missing Name", "Please enter your name.");
+        return;
+    }
 
     if(email.isEmpty() || password.isEmpty())
     {
@@ -101,16 +108,59 @@ void MainWindow::on_registerButton_clicked()
     }
 
     authManager->registerUser(email, password,
-                      [this, email](QString token, QString uid)
-                      {
-                          // Create user record in Firestore
-                          firestoreClient->createUser(uid, email, "student", token);
+                              [this, name, email](QString token, QString uid)
+                       {
+        if (token.isEmpty() || uid.isEmpty()) {
+            QMessageBox::warning(this, "Registration Failed",
+                                 "Could not create account. "
+                                 "Email may already be in use.");
+            return;
+        }
 
-                          QMessageBox::information(this,"Success","Account created successfully!");
+        // ── 4. Save token & uid for this session ──────────────────────────
+        currentToken = token;
+        currentUID   = uid;
+        firestoreClient->generateUniqueLibraryId(name, token,
+        [this, name, email, token, uid]
+        (QString libraryId)
+        {
+            if (libraryId.isEmpty()) {
+                QMessageBox::warning(this, "Error",
+                                     "Could not generate a Library ID. "
+                                     "Please try again.");
+                ui->registerButton->setEnabled(true);
+                return;
+            }
 
-                          ui->stackedWidget->setCurrentIndex(0);
-                      }
-                      );
+            // ── 5. Build UserInfo and save to Firestore ────────────────────
+            UserInfo newUser;
+            newUser.uid        = uid;
+            newUser.name       = name;
+            newUser.email      = email;
+            newUser.role       = "user";          // default role
+            newUser.libraryId  = libraryId;
+            newUser.fineAmount = 0;               // starts at zero
+
+            firestoreClient->createUser(newUser, token);
+
+            // ── 6. Show success & navigate ─────────────────────────────────
+            QMessageBox::information(
+                this, "Welcome to PocketLib!",
+                "Account created!\n\n"
+                "Name: "       + name      + "\n"
+                             "Library ID: " + libraryId + "\n\n"
+                                  "Please keep your Library ID safe."
+                );
+
+            ui->registerButton->setEnabled(true);
+
+            // Navigate to home page — adjust index to match your stackedWidget
+            // ui->stackedWidget->setCurrentIndex(1);
+
+                                                // Optionally pre-load the user info into the UI right away
+            });
+    });
+
 }
 
 //////////////////////////////////////////////////////////////
@@ -127,6 +177,7 @@ void MainWindow::openDashboard(QString role)
     {
         ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
     }
+    currentRole = role;
 }
 
 //////////////////////////////////////////////////////////////
@@ -173,9 +224,8 @@ void MainWindow::on_addBooks_btn_clicked()
 }
 
 
-void MainWindow::on_back_btn_clicked()
-{
-    if(ui->addRemove_page->isVisible()) ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+void MainWindow::handleSharedAction() {
+    if(currentRole=="admin") ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 //////////////////////////////////////////////////////////////
@@ -310,7 +360,7 @@ void MainWindow::on_addBook_btn_clicked()
         return;
     }
     Book book;
-    // book.id left empty → a UUID will be generated automatically
+
     book.title       = ui->bookName_in->text();
     book.author      = ui->author_in->text();
     book.category    = ui->categ_in->text();
@@ -332,6 +382,64 @@ void MainWindow::on_addBook_btn_clicked()
                             });
 }
 
+
+void MainWindow::on_profile_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->profile_page);
+
+firestoreClient->getUserInfo(currentUID, currentToken,
+                                [this](UserInfo info)
+    {
+        // Guard: if uid is empty the fetch failed
+        if (info.uid.isEmpty()) {
+            QMessageBox::warning(this, "Error",
+                                 "Could not load user information.");
+            return;
+        }
+        ui->name_label->setText(info.name);
+        ui->email_label->setText(info.email);
+        ui->role_label->setText(info.role);
+        ui->libid_label->setText(info.libraryId);
+        ui->fine_label->setText("₹ " + QString::number(info.fineAmount));
+        currentUserName = info.name;
+
+        // Optional: highlight fine in red if > 0
+        if (info.fineAmount > 0) {
+            ui->fine_label->setStyleSheet("color: red; font-weight: bold;");
+        } else {
+            ui->fine_label->setStyleSheet("color: green;");
+        }
+    });
+}
+
+
+void MainWindow::on_change_name_btn_clicked()
+{
+    QString newName = ui->changename_in->text();
+    ui->change_name_btn->setEnabled(false);
+    ui->change_name_btn->setText("Updating…");
+    firestoreClient->updateUserName(currentUID, newName, currentToken,
+                                   [this, newName](bool success)
+                                   {
+                                       // Re-enable button regardless of outcome
+                                       ui->change_name_btn->setEnabled(true);
+                                       ui->change_name_btn->setText("Change Name");
+
+                                       if (!success) {
+                                           QMessageBox::warning(this, "Update Failed",
+                                                                "Could not update your name. "
+                                                                "Please check your connection and try again.");
+                                           return;
+                                       }
+
+                                       // ── 6. Update in-memory state & all UI labels ──────────────────────
+                                       currentUserName = newName;
+                                       ui->name_label->setText(newName);   // profile page label
+
+                                       QMessageBox::information(this, "Name Updated",
+                                                                "Your name has been changed to:\n" + newName);
+                                   });
+}
 
 // This function is triggered when the "Back" button on the Book View Page is clicked.
 // It switches the stackedWidget back to the student dashboard page.

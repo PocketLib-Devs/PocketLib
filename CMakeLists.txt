@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
         firestore/Book.h
+        firestore/UserInfo.h
     )
 else()
     if(ANDROID)
