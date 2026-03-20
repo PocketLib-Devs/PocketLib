@@ -16,6 +16,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void bookViewPage(QString bookTitle,
+                      QString author,
+                      QString category,
+                      QString rating,
+                      QString description);
 
 private slots:
 
@@ -35,12 +40,16 @@ private slots:
     void on_addBooks_btn_clicked();
 
     void on_back_btn_clicked();
+    void on_userMonitoring_btn_clicked();
+    void on_backFromMonitoring_btn_clicked();
+    void on_notificationBell_clicked();
 
     void on_addBook_btn_clicked();
 
     void on_profile_btn_clicked();
 
     void on_change_name_btn_clicked();
+    void on_backButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -53,8 +62,11 @@ private:
 
     QString currentToken;
     QString currentUID;
-
+    void populateMonitoringTable(QJsonArray books);
     void openDashboard(QString role);
+    void checkStudentFines();
+    void processMockPayment(int amount);
+
 };
 
 #endif

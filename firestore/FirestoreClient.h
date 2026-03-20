@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <functional>
+#include <QJsonArray>
 #include <QList>
 #include "Book.h"
 #include "UserInfo.h"
@@ -41,6 +42,24 @@ public:
 
 
 
+    //delete book function
+    void deleteBook(QString documentId, QString idToken);
+
+
+
+    void fetchBorrowedBooks(QString token, std::function<void(QJsonArray)> callback);
+
+    void updateFineInFirestore(QString uid, int fineAmount, QString token);
+
+    void getFineAmount(QString uid, QString token, std::function<void(int)> callback);
+
+signals:
+    void requestError(QString errorMessage);
+    void requestSuccess(QString successMessage);
+
+    void deleteBook(QString documentId);
+
+
 private:
 
     QJsonObject bookToFields(const Book &book) const;
@@ -56,6 +75,9 @@ private:
                        int attemptsLeft,
                        std::function<void(QString)> callback);
     QNetworkAccessManager networkManager;
+
+    QString baseUrl;
+    QString idToken;
 
     const QString projectId = "pocketlib-ea41d";
     QString booksBaseUrl() const

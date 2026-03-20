@@ -219,8 +219,8 @@ QPushButton:pressed {
        <widget class="QLabel" name="label">
         <property name="geometry">
          <rect>
-          <x>260</x>
-          <y>-10</y>
+          <x>350</x>
+          <y>-20</y>
           <width>171</width>
           <height>101</height>
          </rect>
@@ -235,7 +235,7 @@ QPushButton:pressed {
           <x>330</x>
           <y>440</y>
           <width>90</width>
-          <height>29</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="text">
@@ -575,6 +575,58 @@ QPushButton:pressed {
             </property>
             <property name="text">
              <string>TextLabel</string>
+       <widget class="QPushButton" name="notificationBell">
+        <property name="geometry">
+         <rect>
+          <x>850</x>
+          <y>10</y>
+          <width>41</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="bookViewPage">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QWidget" name="bookDetails" native="true">
+          <widget class="QWidget" name="bookImage" native="true">
+           <property name="geometry">
+            <rect>
+             <x>-20</x>
+             <y>0</y>
+             <width>331</width>
+             <height>495</height>
+            </rect>
+           </property>
+           <widget class="QLabel" name="bookImage_label">
+            <property name="geometry">
+             <rect>
+              <x>50</x>
+              <y>70</y>
+              <width>250</width>
+              <height>350</height>
+             </rect>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>350</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>16</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string> BOOK IMAGE</string>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -620,8 +672,326 @@ QPushButton:pressed {
          </spacer>
         </item>
        </layout>
+          </widget>
+          <widget class="QWidget" name="verticalLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>309</x>
+             <y>9</y>
+             <width>581</width>
+             <height>481</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="bookTitleLabel">
+              <property name="font">
+               <font>
+                <pointsize>18</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>BOOK TITLE</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTextEdit" name="bookDescriptionText">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bookAuthorLabel">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>AUTHOR</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bookCategoryLabel">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>CATEGORY</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bookRatingLabel">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>BOOK RATING</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="availabilityLabel">
+              <property name="text">
+               <string>AVAILABILITY</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="borrowButton">
+              <property name="text">
+               <string>BORROW</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="addToMyBooksButton">
+              <property name="text">
+               <string>ADD TO MY BOOKS</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="backButton">
+              <property name="text">
+               <string>BACK</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QWidget" name="sample_page"/>
+      <widget class="QWidget" name="adminDashboardPage">
+       <widget class="QPushButton" name="sidebar_btn">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>10</y>
+          <width>51</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QWidget" name="gridLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>50</y>
+          <width>771</width>
+          <height>471</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="2">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Borrow/extension request</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="addBooks_btn">
+           <property name="text">
+            <string>Add/Remove Books</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="inventory_btn">
+           <property name="text">
+            <string>Inventory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="userMonitoring_btn">
+           <property name="text">
+            <string>User Monitoring</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" rowspan="2">
+          <widget class="QWidget" name="widget" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>My Profile</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="profile_btn">
+                <property name="text">
+                 <string>My Profile</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="myBooks_btn">
+                <property name="text">
+                 <string>My Books</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="history_btn">
+                <property name="text">
+                 <string>My borrow history</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="transaction_btn">
+                <property name="text">
+                 <string>My transaction history</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="help_btn">
+                <property name="text">
+                 <string>Need Help</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="about_btn">
+                <property name="text">
+                 <string>About us</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="logoutAdmin">
+                <property name="text">
+                 <string>Logout</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QPushButton" name="search_btn">
+        <property name="geometry">
+         <rect>
+          <x>320</x>
+          <y>10</y>
+          <width>121</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Search</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="userMonitoringPage">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QPushButton" name="backFromMonitoring_btn">
+          <property name="text">
+           <string>Back to Dashboard</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI Variable</family>
+            <pointsize>14</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>User Monitoring &amp; Fines</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="monitoringTable">
+          <column>
+           <property name="text">
+            <string>Sr. No.</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>User Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Book Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Borrow Date</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Return Date</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Action</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="addRemove_page">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="0">
