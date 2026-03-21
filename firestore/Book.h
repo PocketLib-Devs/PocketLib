@@ -12,7 +12,7 @@ struct Book
     QString id;           // Firestore document ID (auto-generated or custom)
     QString title;
     QString author;
-    bool    available  = true;
+    int     available;
     QString category;
     QString coverUrl;
     QString description;

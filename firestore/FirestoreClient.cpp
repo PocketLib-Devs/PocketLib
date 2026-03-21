@@ -157,7 +157,7 @@ QJsonObject FirestoreClient::bookToFields(const Book &book) const
 
     fields["title"]       = QJsonObject{ {"stringValue",  book.title}       };
     fields["author"]      = QJsonObject{ {"stringValue",  book.author}      };
-    fields["available"]   = QJsonObject{ {"booleanValue", book.available}   };
+    fields["available"]   = QJsonObject{ {"integerValue", book.available}   };
     fields["category"]    = QJsonObject{ {"stringValue",  book.category}    };
     fields["coverUrl"]    = QJsonObject{ {"stringValue",  book.coverUrl}    };
     fields["description"] = QJsonObject{ {"stringValue",  book.description} };
@@ -293,7 +293,7 @@ Book FirestoreClient::fieldsToBook(const QString     &docName,
 
     book.title       = fields["title"]      .toObject()["stringValue"] .toString();
     book.author      = fields["author"]     .toObject()["stringValue"] .toString();
-    book.available   = fields["available"]  .toObject()["booleanValue"].toBool(true);
+    book.available   = fields["available"]  .toObject()["integerValue"].toString().toInt();
     book.category    = fields["category"]   .toObject()["stringValue"] .toString();
     book.coverUrl    = fields["coverUrl"]   .toObject()["stringValue"] .toString();
     book.description = fields["description"].toObject()["stringValue"] .toString();
@@ -503,3 +503,120 @@ void FirestoreClient::updateUserName(const QString &uid,
             });
 }
 
+void FirestoreClient::updateBook(const Book    &book,
+                                 const QString &token,
+                                 std::function<void(bool success)> callback)
+{
+    if (book.id.isEmpty()) {
+        qDebug() << "updateBook: book.id must not be empty";
+        callback(false);
+        return;
+    }
+
+    // Build the updateMask query string so Firestore only touches these fields
+    QString url = booksBaseUrl() + "/" + book.id
+                  + "?updateMask.fieldPaths=title"
+                    "&updateMask.fieldPaths=author"
+                    "&updateMask.fieldPaths=available"
+                    "&updateMask.fieldPaths=category"
+                    "&updateMask.fieldPaths=coverUrl"
+                    "&updateMask.fieldPaths=description"
+                    "&updateMask.fieldPaths=rating"
+                    "&updateMask.fieldPaths=section";
+
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QJsonObject body;
+    body["fields"] = bookToFields(book);
+
+    QNetworkReply *reply = networkManager.sendCustomRequest(
+        request, "PATCH",
+        QJsonDocument(body).toJson()
+        );
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                QByteArray    response = reply->readAll();
+                QJsonDocument jsonDoc  = QJsonDocument::fromJson(response);
+                QJsonObject   json     = jsonDoc.object();
+
+                if (json.contains("error")) {
+                    QString msg = json["error"].toObject()["message"].toString();
+                    qDebug() << "updateBook failed:" << msg;
+                    callback(false);
+                } else {
+                    callback(true);
+                }
+
+                reply->deleteLater();
+            });
+}
+
+void FirestoreClient::removeBook(const QString &bookId,
+                                 const QString &token,
+                                 std::function<void(bool success)> callback)
+{
+    QString url = booksBaseUrl() + "/" + bookId;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.deleteResource(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]()
+            {
+                // Firestore returns an empty JSON object {} on successful delete
+                int statusCode =
+                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+                if (statusCode == 200) {
+                    callback(true);
+                } else {
+                    QByteArray response = reply->readAll();
+                    qDebug() << "removeBook failed. Status:" << statusCode
+                             << "Body:" << response;
+                    callback(false);
+                }
+
+                reply->deleteLater();
+            });
+}
+void FirestoreClient::getAllBooks(const QString &token,
+                                  std::function<void(QList<Book> books)> callback)
+{
+    QNetworkRequest request(booksBaseUrl());
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.get(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback, this]()
+            {
+                QByteArray    response = reply->readAll();
+                QJsonDocument jsonDoc  = QJsonDocument::fromJson(response);
+                QJsonObject   json     = jsonDoc.object();
+
+                QList<Book> books;
+
+                if (json.contains("error")) {
+                    QString msg = json["error"].toObject()["message"].toString();
+                    qDebug() << "getAllBooks failed:" << msg;
+                    callback(books);           // return empty list
+                    reply->deleteLater();
+                    return;
+                }
+
+                // Firestore returns: { "documents": [ { "name":..., "fields":... }, ... ] }
+                QJsonArray documents = json["documents"].toArray();
+                for (const QJsonValue &val : documents) {
+                    QJsonObject doc    = val.toObject();
+                    QString     name   = doc["name"].toString();
+                    QJsonObject fields = doc["fields"].toObject();
+                    books.append(fieldsToBook(name, fields));
+                }
+
+                callback(books);
+                reply->deleteLater();
+            });
+}

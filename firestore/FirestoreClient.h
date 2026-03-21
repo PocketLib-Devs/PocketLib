@@ -53,6 +53,16 @@ public:
 
     void getFineAmount(QString uid, QString token, std::function<void(int)> callback);
 
+    void updateBook(const Book &book, const QString &token,
+                    std::function<void(bool success)> callback);
+
+    void removeBook(const QString &bookId, const QString &token,
+                    std::function<void(bool success)> callback);
+
+    void getAllBooks(const QString &token,
+                     std::function<void(QList<Book> books)> callback);
+
+
 signals:
     void requestError(QString errorMessage);
     void requestSuccess(QString successMessage);

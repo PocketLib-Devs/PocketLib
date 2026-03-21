@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connect(ui->back_btn, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
+    connect(ui->back_btn_3, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     // Start app at login screen
     ui->stackedWidget->setCurrentWidget(ui->loginPage);
@@ -371,7 +372,7 @@ void MainWindow::on_addBook_btn_clicked()
     book.description = ui->textEdit_description->toPlainText();
     book.rating      = ui->doubleSpinBox_rating->value();
     book.section     = ui->lineEdit_section->text();
-    book.available   = ui->checkBox->isChecked();
+    book.available   = ui->spinBox_qty->value();
 
     firestoreClient->addBook(book, currentToken,
                             [this](QString docId)
@@ -481,3 +482,156 @@ void MainWindow::bookViewPage(QString title,
     // to the Book View Page so the user can see the details
     ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 }
+
+void MainWindow::on_update_btn_clicked()
+{
+    if (selectedBookId.isEmpty()) {
+        QMessageBox::warning(this, "No Book Selected",
+                             "Please click a book in the table first.");
+        return;
+    }
+
+    Book book;
+    book.id          = selectedBookId;           // ← comes from row click
+    book.title       = ui->bookName_in->text();
+    book.author      = ui->author_in->text();
+    book.category    = ui->categ_in->text();
+    book.coverUrl    = ui->lineEdit_coverUrl->text();
+    book.description = ui->textEdit_description->toPlainText();
+    book.rating      = ui->doubleSpinBox_rating->value();
+    book.section     = ui->lineEdit_section->text();
+    book.available   = ui->spinBox_qty->value();
+
+    firestoreClient->updateBook(book, currentToken, [this](bool success) {
+        if (success) {
+            QMessageBox::information(this, "Success", "Book updated.");
+
+            selectedBookId.clear();
+        } else {
+            QMessageBox::warning(this, "Failed", "Could not update book.");
+        }
+    });
+}
+
+
+void MainWindow::on_remove_btn_clicked()
+{
+
+    if (selectedBookId.isEmpty()) {
+        QMessageBox::warning(this, "No Book Selected",
+                             "Please click a book in the table first.");
+        return;
+    }
+
+    // Confirm before deleting
+    auto confirm = QMessageBox::question(
+        this, "Confirm Delete",
+        "Are you sure you want to remove this book?\n\n"
+            + ui->bookName_in->text(),
+        QMessageBox::Yes | QMessageBox::No
+        );
+    if (confirm != QMessageBox::Yes) return;
+
+    firestoreClient->removeBook(selectedBookId, currentToken,
+                               [this](bool success)
+                               {
+                                   if (success) {
+                                       QMessageBox::information(this, "Removed", "Book removed.");
+
+                                       selectedBookId.clear();
+
+                                       // Clear the edit fields
+                                       ui->bookName_in->clear();
+                                       ui->author_in->clear();
+                                       ui->categ_in->clear();
+                                       ui->label_selectedBook->setText("No book selected.");
+                                   } else {
+                                       QMessageBox::warning(this, "Failed", "Could not remove book.");
+                                   }
+                               });
+
+}
+
+
+void MainWindow::on_inventory_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->inventory);
+    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
+                                {
+                                    ui->tableWidget_books->setRowCount(0);
+                                    ui->tableWidget_books->setColumnCount(9);
+                                    ui->tableWidget_books->setHorizontalHeaderLabels(
+                                        {"", "Title", "Author", "Category", "Rating", "Available","Description","Section","Cover URL"});
+
+                                    // Hide column 0 — it holds the document ID invisibly
+                                    ui->tableWidget_books->setColumnHidden(0, true);
+
+                                    for (const Book &b : books)
+                                    {
+                                        int row = ui->tableWidget_books->rowCount();
+                                        ui->tableWidget_books->insertRow(row);
+
+                                        // Column 0 (hidden) — stores the document ID
+                                        ui->tableWidget_books->setItem(row, 0,
+                                                                       new QTableWidgetItem(b.id));
+
+                                        // Visible columns
+                                        ui->tableWidget_books->setItem(row, 1,
+                                                                       new QTableWidgetItem(b.title));
+                                        ui->tableWidget_books->setItem(row, 2,
+                                                                       new QTableWidgetItem(b.author));
+                                        ui->tableWidget_books->setItem(row, 3,
+                                                                       new QTableWidgetItem(b.category));
+                                        ui->tableWidget_books->setItem(row, 4,
+                                                                       new QTableWidgetItem(QString::number(b.rating)));
+                                        ui->tableWidget_books->setItem(row, 5,
+                                                                       new QTableWidgetItem(QString::number(b.available)));
+                                        ui->tableWidget_books->setItem(row, 6,
+                                                                       new QTableWidgetItem(b.description));
+                                        ui->tableWidget_books->setItem(row, 7,
+                                                                      new QTableWidgetItem(b.section));
+                                        ui->tableWidget_books->setItem(row, 8,
+                                                                      new QTableWidgetItem(b.coverUrl));
+                                    }
+                                });
+}
+
+
+
+void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
+{
+    selectedBookId = ui->tableWidget_books->item(row, 0)->text();
+
+    // Auto-fill all edit fields so admin can modify and hit Update
+    Book b;
+    ui->bookName_in->setText(
+        ui->tableWidget_books->item(row, 1)->text());
+    ui->author_in->setText(
+        ui->tableWidget_books->item(row, 2)->text());
+    ui->categ_in->setText(
+        ui->tableWidget_books->item(row, 3)->text());
+    ui->doubleSpinBox_rating->setValue(
+        (ui->tableWidget_books->item(row, 4)->text()).toDouble());
+    ui->spinBox_qty->setValue(
+        (ui->tableWidget_books->item(row, 5)->text()).toInt());
+    ui->textEdit_description->setText(
+        ui->tableWidget_books->item(row, 6)->text());
+    ui->lineEdit_section->setText(
+        ui->tableWidget_books->item(row, 7)->text());
+    ui->lineEdit_coverUrl->setText(
+        ui->tableWidget_books->item(row, 8)->text());
+
+    // Show which book is selected
+    ui->label_selectedBook->setText(
+        "Selected: " + ui->tableWidget_books->item(row, 1)->text()
+        + "  [ID: " + selectedBookId + "]");
+
+    qDebug() << "Selected book ID:" << selectedBookId;
+}
+
+
+void MainWindow::on_update_to_add_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+}
+
