@@ -49,11 +49,23 @@ private slots:
     void on_change_name_btn_clicked();
     void on_backButton_clicked();
 
+    void on_update_btn_clicked();
+
+    void on_remove_btn_clicked();
+
+    void on_inventory_btn_clicked();
+
+    void on_tableWidget_books_cellClicked(int row, int column);
+
+    void on_update_to_add_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     QString currentUserName;
     QString currentRole;
+
+    QString selectedBookId;
 
     AuthManager *authManager;
     FirestoreClient *firestoreClient;
