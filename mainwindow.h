@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "auth/AuthManager.h"
 #include "firestore/FirestoreClient.h"
+#include <QListWidgetItem>
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,11 +18,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void bookViewPage(QString bookTitle,
+    void bookViewPage(QString title,
                       QString author,
                       QString category,
                       QString rating,
-                      QString description);
+                      QString description,
+                      QIcon coverIcon);
 
 private slots:
 
@@ -58,6 +61,13 @@ private slots:
     void on_tableWidget_books_cellClicked(int row, int column);
 
     void on_update_to_add_btn_clicked();
+    void on_search_btn_clicked();
+    void on_backFromSearch_btn_clicked();
+
+    void on_searchLineEdit_textChanged(const QString &arg1);
+    void on_genreFilterCombo_currentTextChanged(const QString &arg1);
+    void on_bookCoverGrid_itemClicked(QListWidgetItem *item);
+    void on_browseImage_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -76,6 +86,8 @@ private:
     void openDashboard(QString role);
     void checkStudentFines();
     void processMockPayment(int amount);
+    void filterBooks();
+    void populateBookGrid(QList<Book> books);
 
 };
 

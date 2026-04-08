@@ -6,7 +6,9 @@
 #include "config.h"
 #include <QProgressDialog>
 #include <QThread>
-
+#include <QFileDialog>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,22 +23,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->back_btn_3, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     // Start app at login screen
-    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+    ui->stackedwidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(this);
     firestoreClient = new FirestoreClient(this);
     ui->widget->hide();
-
+    ui->genreFilterCombo->addItem("All Genres");
+    ui->genreFilterCombo->addItem("Sci-Fi");
+    ui->genreFilterCombo->addItem("Engineering");
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-//////////////////////////////////////////////////////////////
-// LOGIN
-//////////////////////////////////////////////////////////////
 
 void MainWindow::on_loginButton_clicked()
 {
@@ -60,10 +60,10 @@ void MainWindow::on_loginButton_clicked()
 firestoreClient->getUserRole(uid, token, [this](QString role) 
 {
     if (role == "admin") {
-        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
     }
     else if (role == "student") {
-        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
         checkStudentFines(); // Triggers the bell check
     }
             currentRole = role;
@@ -78,7 +78,7 @@ firestoreClient->getUserRole(uid, token, [this](QString role)
 
 void MainWindow::on_openRegisterButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->registerPage);
+    ui->stackedwidget->setCurrentWidget(ui->registerPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ void MainWindow::on_openRegisterButton_clicked()
 
 void MainWindow::on_backToLoginButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+    ui->stackedwidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -175,11 +175,11 @@ void MainWindow::openDashboard(QString role)
 {
     if(role == "admin")
     {
-        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
     }
     else
     {
-        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
     }
     currentRole = role;
 }
@@ -196,7 +196,7 @@ void MainWindow::on_logoutStudent_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+    ui->stackedwidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ void MainWindow::on_logoutAdmin_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedWidget->setCurrentWidget(ui->loginPage);
+    ui->stackedwidget->setCurrentWidget(ui->loginPage);
 }
 
 void MainWindow::on_sidebar_btn_clicked()
@@ -224,13 +224,13 @@ void MainWindow::on_sidebar_btn_clicked()
 
 void MainWindow::on_addBooks_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
 void MainWindow::handleSharedAction() {
-    if(currentRole=="admin") ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
-    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+    if(currentRole=="admin") ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
 }
 //////////////////////////////////////////////////////////////
 // OPEN USER MONITORING PAGE
@@ -238,7 +238,7 @@ void MainWindow::handleSharedAction() {
 
 void MainWindow::on_userMonitoring_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->userMonitoringPage);
+    ui->stackedwidget->setCurrentWidget(ui->userMonitoringPage);
 
 
         // Fetch the books and send them to the table!
@@ -254,7 +254,7 @@ void MainWindow::on_userMonitoring_btn_clicked()
 
 void MainWindow::on_backFromMonitoring_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
 }
 
 void MainWindow::on_notificationBell_clicked()
@@ -389,7 +389,7 @@ void MainWindow::on_addBook_btn_clicked()
 
 void MainWindow::on_profile_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->profile_page);
+    ui->stackedwidget->setCurrentWidget(ui->profile_page);
 
 firestoreClient->getUserInfo(currentUID, currentToken,
                                 [this](UserInfo info)
@@ -446,12 +446,12 @@ void MainWindow::on_change_name_btn_clicked()
 }
 
 // This function is triggered when the "Back" button on the Book View Page is clicked.
-// It switches the stackedWidget back to the student dashboard page.
+// It switches the stackedwidget back to the student dashboard page.
 void MainWindow::on_backButton_clicked()
 {
     // stackedWidget contains all the pages of the application.
     // setCurrentWidget() changes the visible page.
-    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+    ui->stackedwidget->setCurrentWidget(ui->searchPage);
 }
 
 
@@ -461,26 +461,24 @@ void MainWindow::bookViewPage(QString title,
                               QString author,
                               QString category,
                               QString rating,
-                              QString description)
+                              QString description,
+                              QIcon coverIcon) // <--- ADD THIS
 {
-    // Set the book title label with the title passed to the function
     ui->bookTitleLabel->setText(title);
-
-    // Set the author label
     ui->bookAuthorLabel->setText(author);
-
-    // Set the category label
     ui->bookCategoryLabel->setText(category);
-
-    // Set the rating label
     ui->bookRatingLabel->setText(rating);
-
-    // Set the book description text box
     ui->bookDescriptionText->setText(description);
 
-    // Change the current visible page of the stackedWidget
-    // to the Book View Page so the user can see the details
-    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
+    // --- NEW: Set the image ---
+    // Extract a nice big pixmap from the icon to fit your label
+    QPixmap coverPixmap = coverIcon.pixmap(250, 350);
+    ui->bookImage_label->setPixmap(coverPixmap);
+    // Ensure the image stretches to fit the label bounds properly
+    ui->bookImage_label->setScaledContents(true);
+    // --------------------------
+
+    ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
 }
 
 void MainWindow::on_update_btn_clicked()
@@ -555,7 +553,7 @@ void MainWindow::on_remove_btn_clicked()
 
 void MainWindow::on_inventory_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->inventory);
+    ui->stackedwidget->setCurrentWidget(ui->inventory);
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
                                 {
                                     ui->tableWidget_books->setRowCount(0);
@@ -632,6 +630,175 @@ void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
 
 void MainWindow::on_update_to_add_btn_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
 }
 
+
+// --- Navigation ---
+
+void MainWindow::on_search_btn_clicked()
+{
+    // Switch the stacked widget to the Search Page
+    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+
+    // Fetch the live inventory from Firestore and pass it to the grid
+    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books) {
+        populateBookGrid(books);
+    });
+}
+
+void MainWindow::on_backFromSearch_btn_clicked()
+{
+    // Switch back to the admin dashboard
+    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+}
+
+// --- Live Search & Filter Logic ---
+
+void MainWindow::on_searchLineEdit_textChanged(const QString &arg1)
+{
+    // Trigger the filter whenever a letter is typed or deleted
+    filterBooks();
+}
+
+void MainWindow::on_genreFilterCombo_currentTextChanged(const QString &arg1)
+{
+    // Trigger the filter whenever a new genre is selected
+    filterBooks();
+}
+
+void MainWindow::filterBooks()
+{
+    // 1. Get the search text, converted to lowercase for case-insensitive matching
+    QString searchText = ui->searchLineEdit->text().toLower();
+
+    // 2. Get the currently selected genre
+    QString selectedGenre = ui->genreFilterCombo->currentText();
+
+    // 3. Loop through every item in the cover grid
+    for (int i = 0; i < ui->bookCoverGrid->count(); ++i) {
+
+        QListWidgetItem *item = ui->bookCoverGrid->item(i);
+        if (!item) continue;
+
+        // Get the title (this is the visible text under the icon)
+        QString title = item->text().toLower();
+
+        // Retrieve the hidden Author and Genre data we saved inside the item
+        QString author = item->data(Qt::UserRole + 1).toString().toLower();
+        QString genre = item->data(Qt::UserRole + 2).toString();
+
+        // Check if the title OR the author contains the typed letters
+        bool matchesSearch = title.contains(searchText) || author.contains(searchText);
+
+        // THE FIX: Convert selectedGenre to lowercase just for the "All Genres" check
+        bool matchesGenre = (selectedGenre.toLower() == "all genres") || (genre == selectedGenre);
+
+        // 4. Show or hide the icon based on the filters
+        if (matchesSearch && matchesGenre) {
+            item->setHidden(false); // Show it
+        } else {
+            item->setHidden(true);  // Hide it
+        }
+    }
+}
+
+
+void MainWindow::populateBookGrid(QList<Book> books)
+{
+    ui->bookCoverGrid->clear();
+    ui->genreFilterCombo->clear();
+    ui->genreFilterCombo->addItem("All genres");
+    QStringList genresLoaded;
+
+    ui->bookCoverGrid->setIconSize(QSize(100, 150));
+    ui->bookCoverGrid->setGridSize(QSize(140, 200));
+
+    // Create a network manager to handle all the image downloads
+    QNetworkAccessManager *imageManager = new QNetworkAccessManager(this);
+
+    for (const Book &b : books) {
+
+        // 1. Keep the grey placeholder so the grid loads instantly
+        QPixmap placeholderCover(100, 150);
+        placeholderCover.fill(QColor("#DCE1E6"));
+        QListWidgetItem *bookItem = new QListWidgetItem(QIcon(placeholderCover), b.title);
+
+        bookItem->setForeground(QBrush(Qt::black));
+        bookItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+
+        bookItem->setData(Qt::UserRole, b.id);
+        bookItem->setData(Qt::UserRole + 1, b.author.toLower());
+        bookItem->setData(Qt::UserRole + 2, b.category);
+        bookItem->setData(Qt::UserRole + 3, QString::number(b.rating));
+        bookItem->setData(Qt::UserRole + 4, b.description);
+
+        ui->bookCoverGrid->addItem(bookItem);
+
+        if (!genresLoaded.contains(b.category) && !b.category.isEmpty()) {
+            genresLoaded.append(b.category);
+            ui->genreFilterCombo->addItem(b.category);
+        }
+
+        // ---------------------------------------------------------
+        // 2. NEW: Download the actual image in the background!
+        // ---------------------------------------------------------
+        if (!b.coverUrl.isEmpty() && b.coverUrl.startsWith("http")) {
+            QNetworkRequest request((QUrl(b.coverUrl)));
+            QNetworkReply *reply = imageManager->get(request);
+
+            // When this specific image finishes downloading, update the icon
+            connect(reply, &QNetworkReply::finished, [reply, bookItem]() {
+                if (reply->error() == QNetworkReply::NoError) {
+                    QByteArray imageData = reply->readAll();
+                    QPixmap pixmap;
+                    if (pixmap.loadFromData(imageData)) {
+                        // Scale the image so it fits the 100x150 slot perfectly without stretching
+                        QPixmap scaledPixmap = pixmap.scaled(100, 150, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+                        bookItem->setIcon(QIcon(scaledPixmap));
+                    }
+                }
+                reply->deleteLater();
+            });
+        }
+    }
+}
+
+void MainWindow::on_bookCoverGrid_itemClicked(QListWidgetItem *item)
+{
+    // 1. Extract the visible text (Title)
+    QString title = item->text();
+
+    // 2. Extract the hidden data
+    QString author      = item->data(Qt::UserRole + 1).toString();
+    QString category    = item->data(Qt::UserRole + 2).toString();
+    QString rating      = item->data(Qt::UserRole + 3).toString();
+    QString description = item->data(Qt::UserRole + 4).toString();
+
+    // 3. Grab the actual image we downloaded for the grid
+    QIcon coverIcon = item->icon();
+
+    // 4. Pass ALL 6 items to your view page (Notice coverIcon is at the end!)
+    bookViewPage(title, author, category, rating, description, coverIcon);
+}
+void MainWindow::on_browseImage_btn_clicked()
+{
+    // Open a file dialog to let the user pick an image
+    QString imagePath = QFileDialog::getOpenFileName(this, "Select Book Cover", "", "Images (*.png *.jpg *.jpeg)");
+
+    if (imagePath.isEmpty()) return; // User canceled
+
+    // Temporarily disable the Add button so they don't submit before the upload finishes
+    ui->addBook_btn->setEnabled(false);
+    ui->lineEdit_coverUrl->setText("Uploading...");
+
+    firestoreClient->uploadImageToCloudinary(imagePath, [this](QString url) {
+        if (!url.isEmpty()) {
+            // Put the final URL into the text box so your existing addBook function can grab it!
+            ui->lineEdit_coverUrl->setText(url);
+        } else {
+            ui->lineEdit_coverUrl->setText("Upload Failed");
+        }
+        ui->addBook_btn->setEnabled(true);
+    });
+}
