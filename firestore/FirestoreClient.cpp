@@ -620,3 +620,64 @@ void FirestoreClient::getAllBooks(const QString &token,
                 reply->deleteLater();
             });
 }
+void FirestoreClient::uploadImageToCloudinary(const QString &localFilePath, std::function<void(QString)> callback)
+{
+    // 1. Setup the File
+    QFile *file = new QFile(localFilePath);
+    if (!file->open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not open image file:" << localFilePath;
+        callback("");
+        delete file;
+        return;
+    }
+
+    // Replace these with YOUR actual Cloud Name and Preset Name!
+    QString cloudName = "dtg3gx9fx";
+    QString uploadPreset = "pocketlib_covers";
+
+    QString url = "https://api.cloudinary.com/v1_1/" + cloudName + "/image/upload";
+    QNetworkRequest request((QUrl(url)));
+
+    // 2. Create the MultiPart form data
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    // Part A: The Upload Preset (Tells Cloudinary where to put it)
+    QHttpPart presetPart;
+    presetPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"upload_preset\""));
+    presetPart.setBody(uploadPreset.toUtf8());
+    multiPart->append(presetPart);
+
+    // Part B: The Image File itself
+    QHttpPart imagePart;
+    QFileInfo fileInfo(localFilePath);
+    // Give the file a name in the form data
+    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                        QVariant(QString("form-data; name=\"file\"; filename=\"%1\"").arg(fileInfo.fileName())));
+    imagePart.setBodyDevice(file);
+    file->setParent(multiPart); // Ensure the file is deleted when the multiPart is deleted
+    multiPart->append(imagePart);
+
+    // 3. Send the POST Request
+    QNetworkReply *reply = networkManager.post(request, multiPart);
+
+    // Attach the multiPart to the reply so it isn't deleted before the upload finishes
+    multiPart->setParent(reply);
+
+    // 4. Handle the Response
+    connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray response = reply->readAll();
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+
+            // Cloudinary returns the public, permanent URL as "secure_url"
+            QString secureUrl = jsonDoc.object().value("secure_url").toString();
+            qDebug() << "Upload Successful! URL:" << secureUrl;
+            callback(secureUrl);
+        } else {
+            qDebug() << "Upload Failed:" << reply->errorString();
+            qDebug() << reply->readAll(); // Prints the exact error from Cloudinary
+            callback("");
+        }
+        reply->deleteLater();
+    });
+}
