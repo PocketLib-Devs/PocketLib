@@ -68,6 +68,9 @@ private slots:
     void on_genreFilterCombo_currentTextChanged(const QString &arg1);
     void on_bookCoverGrid_itemClicked(QListWidgetItem *item);
     void on_browseImage_btn_clicked();
+    void on_forgotPassword_btn_clicked();
+    void on_changepsd_btn_clicked();
+
 
 private:
     Ui::MainWindow *ui;

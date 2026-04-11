@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->genreFilterCombo->addItem("All Genres");
     ui->genreFilterCombo->addItem("Sci-Fi");
     ui->genreFilterCombo->addItem("Engineering");
+    ui->forgotPassword_btn->hide();
 }
 
 MainWindow::~MainWindow()
@@ -46,31 +47,35 @@ void MainWindow::on_loginButton_clicked()
     authManager->loginUser(email, password,
                            [this](QString token, QString uid)
                            {
+                               // 1. Check if login failed
+                               if (token.isEmpty()) {
+                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
+                                   // Show the forgot password button on failure
+                                   ui->forgotPassword_btn->show();
+                                   return;
+                               }
 
+                               // 2. Login succeeded! Hide the button again for next time
+                               ui->forgotPassword_btn->hide();
+
+                               // 3. Save current user details
                                this->currentToken = token;
                                this->currentUID = uid;
 
-                               if (token.isEmpty()) {
-                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
-                                   return;
-                               }
-                               currentToken = token;
-                               currentUID   = uid;
-
-firestoreClient->getUserRole(uid, token, [this](QString role) 
-{
-    if (role == "admin") {
-        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-    }
-    else if (role == "student") {
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
-        checkStudentFines(); // Triggers the bell check
-    }
-            currentRole = role;
-        }); // This closes the firestoreClient->getUserRole callback (Line 69)
-    }); // ADD THIS to close the authManager->loginUser callback
-}   // ADD THIS to close the void MainWindow::on_loginButton_clicked() function
-
+                               // 4. Fetch the role and redirect to the correct dashboard
+                               firestoreClient->getUserRole(uid, token, [this](QString role)
+                                                            {
+                                                                if (role == "admin") {
+                                                                    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+                                                                }
+                                                                else if (role == "student") {
+                                                                    ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+                                                                    checkStudentFines(); // Triggers the bell check
+                                                                }
+                                                                currentRole = role;
+                                                            });
+                           });
+}
 ///////////////////////////////////////////////////////////
 // REGISTER PAGE OPEN
 // REGISTER PAGE OPEN
@@ -801,4 +806,30 @@ void MainWindow::on_browseImage_btn_clicked()
         }
         ui->addBook_btn->setEnabled(true);
     });
+}
+
+void MainWindow::on_forgotPassword_btn_clicked()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Password Reset");
+    msgBox.setText("<b>Account Locked / Forgot Password</b>");
+    msgBox.setInformativeText("Because PocketLib uses internal Library IDs, automated email resets are disabled.\n\n"
+                              "Please visit the Library Help Desk or contact the System Administrator to verify your identity and reset your password.");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+
+    msgBox.exec();
+}
+
+void MainWindow::on_changepsd_btn_clicked()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Change Password");
+    msgBox.setText("<b>Password Change Restricted</b>");
+    msgBox.setInformativeText("Because PocketLib uses internal Library IDs, automated password changes are currently disabled in the app.\n\n"
+                              "Please contact the System Administrator or visit the Library Help Desk to request a new password.");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+
+    msgBox.exec();
 }
