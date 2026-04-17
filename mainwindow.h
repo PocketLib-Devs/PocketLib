@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include "auth/AuthManager.h"
 #include "firestore/FirestoreClient.h"
-#include <QListWidgetItem>
-#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,12 +16,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void bookViewPage(QString title,
+    void bookViewPage(QString bookTitle,
                       QString author,
                       QString category,
                       QString rating,
-                      QString description,
-                      QIcon coverIcon);
+                      QString description);
 
 private slots:
 
@@ -52,33 +49,11 @@ private slots:
     void on_change_name_btn_clicked();
     void on_backButton_clicked();
 
-    void on_update_btn_clicked();
-
-    void on_remove_btn_clicked();
-
-    void on_inventory_btn_clicked();
-
-    void on_tableWidget_books_cellClicked(int row, int column);
-
-    void on_update_to_add_btn_clicked();
-    void on_search_btn_clicked();
-    void on_backFromSearch_btn_clicked();
-
-    void on_searchLineEdit_textChanged(const QString &arg1);
-    void on_genreFilterCombo_currentTextChanged(const QString &arg1);
-    void on_bookCoverGrid_itemClicked(QListWidgetItem *item);
-    void on_browseImage_btn_clicked();
-    void on_forgotPassword_btn_clicked();
-    void on_changepsd_btn_clicked();
-
-
 private:
     Ui::MainWindow *ui;
 
     QString currentUserName;
     QString currentRole;
-
-    QString selectedBookId;
 
     AuthManager *authManager;
     FirestoreClient *firestoreClient;
@@ -89,8 +64,6 @@ private:
     void openDashboard(QString role);
     void checkStudentFines();
     void processMockPayment(int amount);
-    void filterBooks();
-    void populateBookGrid(QList<Book> books);
 
 };
 

@@ -157,7 +157,7 @@ QJsonObject FirestoreClient::bookToFields(const Book &book) const
 
     fields["title"]       = QJsonObject{ {"stringValue",  book.title}       };
     fields["author"]      = QJsonObject{ {"stringValue",  book.author}      };
-    fields["available"]   = QJsonObject{ {"integerValue", book.available}   };
+    fields["available"]   = QJsonObject{ {"booleanValue", book.available}   };
     fields["category"]    = QJsonObject{ {"stringValue",  book.category}    };
     fields["coverUrl"]    = QJsonObject{ {"stringValue",  book.coverUrl}    };
     fields["description"] = QJsonObject{ {"stringValue",  book.description} };
@@ -293,7 +293,7 @@ Book FirestoreClient::fieldsToBook(const QString     &docName,
 
     book.title       = fields["title"]      .toObject()["stringValue"] .toString();
     book.author      = fields["author"]     .toObject()["stringValue"] .toString();
-    book.available   = fields["available"]  .toObject()["integerValue"].toString().toInt();
+    book.available   = fields["available"]  .toObject()["booleanValue"].toBool(true);
     book.category    = fields["category"]   .toObject()["stringValue"] .toString();
     book.coverUrl    = fields["coverUrl"]   .toObject()["stringValue"] .toString();
     book.description = fields["description"].toObject()["stringValue"] .toString();
@@ -503,181 +503,3 @@ void FirestoreClient::updateUserName(const QString &uid,
             });
 }
 
-void FirestoreClient::updateBook(const Book    &book,
-                                 const QString &token,
-                                 std::function<void(bool success)> callback)
-{
-    if (book.id.isEmpty()) {
-        qDebug() << "updateBook: book.id must not be empty";
-        callback(false);
-        return;
-    }
-
-    // Build the updateMask query string so Firestore only touches these fields
-    QString url = booksBaseUrl() + "/" + book.id
-                  + "?updateMask.fieldPaths=title"
-                    "&updateMask.fieldPaths=author"
-                    "&updateMask.fieldPaths=available"
-                    "&updateMask.fieldPaths=category"
-                    "&updateMask.fieldPaths=coverUrl"
-                    "&updateMask.fieldPaths=description"
-                    "&updateMask.fieldPaths=rating"
-                    "&updateMask.fieldPaths=section";
-
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
-
-    QJsonObject body;
-    body["fields"] = bookToFields(book);
-
-    QNetworkReply *reply = networkManager.sendCustomRequest(
-        request, "PATCH",
-        QJsonDocument(body).toJson()
-        );
-
-    connect(reply, &QNetworkReply::finished, [reply, callback]()
-            {
-                QByteArray    response = reply->readAll();
-                QJsonDocument jsonDoc  = QJsonDocument::fromJson(response);
-                QJsonObject   json     = jsonDoc.object();
-
-                if (json.contains("error")) {
-                    QString msg = json["error"].toObject()["message"].toString();
-                    qDebug() << "updateBook failed:" << msg;
-                    callback(false);
-                } else {
-                    callback(true);
-                }
-
-                reply->deleteLater();
-            });
-}
-
-void FirestoreClient::removeBook(const QString &bookId,
-                                 const QString &token,
-                                 std::function<void(bool success)> callback)
-{
-    QString url = booksBaseUrl() + "/" + bookId;
-
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
-
-    QNetworkReply *reply = networkManager.deleteResource(request);
-
-    connect(reply, &QNetworkReply::finished, [reply, callback]()
-            {
-                // Firestore returns an empty JSON object {} on successful delete
-                int statusCode =
-                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-
-                if (statusCode == 200) {
-                    callback(true);
-                } else {
-                    QByteArray response = reply->readAll();
-                    qDebug() << "removeBook failed. Status:" << statusCode
-                             << "Body:" << response;
-                    callback(false);
-                }
-
-                reply->deleteLater();
-            });
-}
-void FirestoreClient::getAllBooks(const QString &token,
-                                  std::function<void(QList<Book> books)> callback)
-{
-    QNetworkRequest request(booksBaseUrl());
-    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
-
-    QNetworkReply *reply = networkManager.get(request);
-
-    connect(reply, &QNetworkReply::finished, [reply, callback, this]()
-            {
-                QByteArray    response = reply->readAll();
-                QJsonDocument jsonDoc  = QJsonDocument::fromJson(response);
-                QJsonObject   json     = jsonDoc.object();
-
-                QList<Book> books;
-
-                if (json.contains("error")) {
-                    QString msg = json["error"].toObject()["message"].toString();
-                    qDebug() << "getAllBooks failed:" << msg;
-                    callback(books);           // return empty list
-                    reply->deleteLater();
-                    return;
-                }
-
-                // Firestore returns: { "documents": [ { "name":..., "fields":... }, ... ] }
-                QJsonArray documents = json["documents"].toArray();
-                for (const QJsonValue &val : documents) {
-                    QJsonObject doc    = val.toObject();
-                    QString     name   = doc["name"].toString();
-                    QJsonObject fields = doc["fields"].toObject();
-                    books.append(fieldsToBook(name, fields));
-                }
-
-                callback(books);
-                reply->deleteLater();
-            });
-}
-void FirestoreClient::uploadImageToCloudinary(const QString &localFilePath, std::function<void(QString)> callback)
-{
-    // 1. Setup the File
-    QFile *file = new QFile(localFilePath);
-    if (!file->open(QIODevice::ReadOnly)) {
-        qDebug() << "Could not open image file:" << localFilePath;
-        callback("");
-        delete file;
-        return;
-    }
-
-    // Replace these with YOUR actual Cloud Name and Preset Name!
-    QString cloudName = "dtg3gx9fx";
-    QString uploadPreset = "pocketlib_covers";
-
-    QString url = "https://api.cloudinary.com/v1_1/" + cloudName + "/image/upload";
-    QNetworkRequest request((QUrl(url)));
-
-    // 2. Create the MultiPart form data
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
-    // Part A: The Upload Preset (Tells Cloudinary where to put it)
-    QHttpPart presetPart;
-    presetPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"upload_preset\""));
-    presetPart.setBody(uploadPreset.toUtf8());
-    multiPart->append(presetPart);
-
-    // Part B: The Image File itself
-    QHttpPart imagePart;
-    QFileInfo fileInfo(localFilePath);
-    // Give the file a name in the form data
-    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                        QVariant(QString("form-data; name=\"file\"; filename=\"%1\"").arg(fileInfo.fileName())));
-    imagePart.setBodyDevice(file);
-    file->setParent(multiPart); // Ensure the file is deleted when the multiPart is deleted
-    multiPart->append(imagePart);
-
-    // 3. Send the POST Request
-    QNetworkReply *reply = networkManager.post(request, multiPart);
-
-    // Attach the multiPart to the reply so it isn't deleted before the upload finishes
-    multiPart->setParent(reply);
-
-    // 4. Handle the Response
-    connect(reply, &QNetworkReply::finished, [reply, callback]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray response = reply->readAll();
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
-
-            // Cloudinary returns the public, permanent URL as "secure_url"
-            QString secureUrl = jsonDoc.object().value("secure_url").toString();
-            qDebug() << "Upload Successful! URL:" << secureUrl;
-            callback(secureUrl);
-        } else {
-            qDebug() << "Upload Failed:" << reply->errorString();
-            qDebug() << reply->readAll(); // Prints the exact error from Cloudinary
-            callback("");
-        }
-        reply->deleteLater();
-    });
-}

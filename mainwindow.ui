@@ -50,16 +50,16 @@ QPushButton:pressed {
     background-color: #004085;
 }</string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QStackedWidget" name="stackedwidget">
+     <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="loginPage">
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="2">
-         <spacer name="horizontalSpacer_4">
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -70,16 +70,6 @@ QPushButton:pressed {
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="loginPassword">
-          <property name="echoMode">
-           <enum>QLineEdit::EchoMode::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter Password</string>
-          </property>
-         </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="appLabel">
@@ -96,22 +86,8 @@ QPushButton:pressed {
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="loginEmail">
-          <property name="placeholderText">
-           <string>Enter Email</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QPushButton" name="loginButton">
-          <property name="text">
-           <string>Login</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_3">
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -123,31 +99,34 @@ QPushButton:pressed {
           </property>
          </spacer>
         </item>
-        <item row="6" column="1">
-         <widget class="QPushButton" name="openRegisterButton">
-          <property name="text">
-           <string>Create Account</string>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="loginEmail">
+          <property name="placeholderText">
+           <string>Enter Email</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1" alignment="Qt::AlignmentFlag::AlignLeft">
-         <widget class="QPushButton" name="forgotPassword_btn">
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-    background-color: transparent;
-    color: #007BFF;
-    border: none;
-    text-decoration: underline;
-}
-QPushButton:hover {
-    color: #0056B3;
-}</string>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="loginPassword">
+          <property name="echoMode">
+           <enum>QLineEdit::EchoMode::Password</enum>
           </property>
+          <property name="placeholderText">
+           <string>Enter Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="loginButton">
           <property name="text">
-           <string>Forgot Password?</string>
+           <string>Login</string>
           </property>
-          <property name="flat">
-           <bool>true</bool>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QPushButton" name="openRegisterButton">
+          <property name="text">
+           <string>Create Account</string>
           </property>
          </widget>
         </item>
@@ -284,19 +263,6 @@ QPushButton:hover {
              <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_2">
@@ -790,6 +756,13 @@ QPushButton:hover {
       <widget class="QWidget" name="userMonitoringPage">
        <layout class="QVBoxLayout" name="verticalLayout_monitoring">
         <item>
+         <widget class="QPushButton" name="backFromMonitoring_btn">
+          <property name="text">
+           <string>Back to Dashboard</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="monitoringTitle">
           <property name="font">
            <font>
@@ -805,31 +778,6 @@ QPushButton:hover {
         </item>
         <item>
          <widget class="QTableWidget" name="monitoringTable">
-          <property name="styleSheet">
-           <string notr="true">QHeaderView::section {
-    background-color: #e0e0e0; /* A slightly darker gray for the background */
-    color: black;              /* Forces the text to be black */
-    font-weight: bold;         /* Optional: makes the headings stand out more */
-    border: 1px solid #c0c0c0; /* Optional: adds a nice border between header cells */
-    padding: 4px;
-}
-/* Set the default text and background color for the table */
-QTableWidget {
-    color: black;
-    background-color: white;
-}
-
-/* Ensure individual cell text is strictly black when not selected */
-QTableWidget::item {
-    color: black;
-}
-
-/* Keep your nice purple selection highlight */
-QTableWidget::item:selected {
-    background-color: #6a0dad; /* A close match to the purple in your screenshot */
-    color: white;
-}</string>
-          </property>
           <column>
            <property name="text">
             <string>Sr. No.</string>
@@ -862,164 +810,11 @@ QTableWidget::item:selected {
           </column>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="backFromMonitoring_btn">
-          <property name="text">
-           <string>Back to Dashboard</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="searchPage">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLineEdit" name="searchLineEdit">
-          <property name="placeholderText">
-           <string>Search by Book's name or Author's name...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="genreFilterCombo">
-          <item>
-           <property name="text">
-            <string>All genres</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Science</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>History</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Fiction</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListWidget" name="bookCoverGrid">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="movement">
-           <enum>QListView::Movement::Static</enum>
-          </property>
-          <property name="resizeMode">
-           <enum>QListView::ResizeMode::Adjust</enum>
-          </property>
-          <property name="spacing">
-           <number>10</number>
-          </property>
-          <property name="viewMode">
-           <enum>QListView::ViewMode::IconMode</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="backFromSearch_btn">
-          <property name="text">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="inventory">
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0" colspan="3">
-         <widget class="QTableWidget" name="tableWidget_books">
-          <property name="styleSheet">
-           <string notr="true">QHeaderView::section {
-    background-color: #e0e0e0; /* A slightly darker gray for the background */
-    color: black;              /* Forces the text to be black */
-    font-weight: bold;         /* Optional: makes the headings stand out more */
-    border: 1px solid #c0c0c0; /* Optional: adds a nice border between header cells */
-    padding: 4px;
-}
-/* Set the default text and background color for the table */
-QTableWidget {
-    color: black;
-    background-color: white;
-}
-
-/* Ensure individual cell text is strictly black when not selected */
-QTableWidget::item {
-    color: black;
-}
-
-/* Keep your nice purple selection highlight */
-QTableWidget::item:selected {
-    background-color: #6a0dad; /* A close match to the purple in your screenshot */
-    color: white;
-}</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="3">
-         <widget class="QLabel" name="label_selectedBook">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="back_btn_3">
-          <property name="text">
-           <string>BACK</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="update_to_add_btn">
-          <property name="text">
-           <string>UPDATE</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="View_btn">
-          <property name="text">
-           <string>VIEW</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="addRemove_page">
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="1" column="1">
-         <widget class="QPushButton" name="update_btn">
-          <property name="text">
-           <string>UPDATE</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QPushButton" name="back_btn">
-          <property name="text">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="remove_btn">
-          <property name="text">
-           <string>REMOVE</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="4">
+        <item row="0" column="0" colspan="3">
          <layout class="QFormLayout" name="formLayout">
           <item row="0" column="0">
            <widget class="QLabel" name="bookName">
@@ -1062,17 +857,24 @@ QTableWidget::item:selected {
              </font>
             </property>
             <property name="text">
-             <string>Quantity</string>
+             <string>Availability</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QSpinBox" name="spinBox_qty">
+           <widget class="QCheckBox" name="checkBox">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: white;
 color: black;
-border: 1px solid gray;
-</string>
+border: 1px solid gray;</string>
+            </property>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -1091,7 +893,7 @@ border: 1px solid gray;
           <item row="3" column="1">
            <widget class="QLineEdit" name="categ_in"/>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="coverUrl">
             <property name="font">
              <font>
@@ -1103,7 +905,10 @@ border: 1px solid gray;
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEdit_coverUrl"/>
+          </item>
+          <item row="5" column="0">
            <widget class="QLabel" name="rating">
             <property name="font">
              <font>
@@ -1118,7 +923,7 @@ border: 1px solid gray;
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="5" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBox_rating">
             <property name="styleSheet">
              <string notr="true">background-color: white;
@@ -1127,7 +932,7 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="description">
             <property name="font">
              <font>
@@ -1142,7 +947,7 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="6" column="1">
            <widget class="QTextEdit" name="textEdit_description">
             <property name="styleSheet">
              <string notr="true">background-color: white;
@@ -1151,7 +956,7 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="section">
             <property name="font">
              <font>
@@ -1163,22 +968,8 @@ border: 1px solid gray;</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="7" column="1">
            <widget class="QLineEdit" name="lineEdit_section"/>
-          </item>
-          <item row="5" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QLineEdit" name="lineEdit_coverUrl"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="browseImage_btn">
-              <property name="text">
-               <string>Browse...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
          </layout>
         </item>
@@ -1186,6 +977,20 @@ border: 1px solid gray;</string>
          <widget class="QPushButton" name="addBook_btn">
           <property name="text">
            <string>ADD</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="remove_btn">
+          <property name="text">
+           <string>REMOVE</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="back_btn">
+          <property name="text">
+           <string>Back</string>
           </property>
          </widget>
         </item>
@@ -1201,7 +1006,7 @@ border: 1px solid gray;</string>
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

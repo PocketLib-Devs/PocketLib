@@ -6,9 +6,7 @@
 #include "config.h"
 #include <QProgressDialog>
 #include <QThread>
-#include <QFileDialog>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,24 +18,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connect(ui->back_btn, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
-    connect(ui->back_btn_3, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     // Start app at login screen
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(this);
     firestoreClient = new FirestoreClient(this);
     ui->widget->hide();
-    ui->genreFilterCombo->addItem("All Genres");
-    ui->genreFilterCombo->addItem("Sci-Fi");
-    ui->genreFilterCombo->addItem("Engineering");
-    ui->forgotPassword_btn->hide();
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//////////////////////////////////////////////////////////////
+// LOGIN
+//////////////////////////////////////////////////////////////
 
 void MainWindow::on_loginButton_clicked()
 {
@@ -47,35 +45,31 @@ void MainWindow::on_loginButton_clicked()
     authManager->loginUser(email, password,
                            [this](QString token, QString uid)
                            {
-                               // 1. Check if login failed
-                               if (token.isEmpty()) {
-                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
-                                   // Show the forgot password button on failure
-                                   ui->forgotPassword_btn->show();
-                                   return;
-                               }
 
-                               // 2. Login succeeded! Hide the button again for next time
-                               ui->forgotPassword_btn->hide();
-
-                               // 3. Save current user details
                                this->currentToken = token;
                                this->currentUID = uid;
 
-                               // 4. Fetch the role and redirect to the correct dashboard
-                               firestoreClient->getUserRole(uid, token, [this](QString role)
-                                                            {
-                                                                if (role == "admin") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-                                                                }
-                                                                else if (role == "student") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
-                                                                    checkStudentFines(); // Triggers the bell check
-                                                                }
-                                                                currentRole = role;
-                                                            });
-                           });
-}
+                               if (token.isEmpty()) {
+                                   QMessageBox::warning(this, "Login Failed", "Invalid email or password");
+                                   return;
+                               }
+                               currentToken = token;
+                               currentUID   = uid;
+
+firestoreClient->getUserRole(uid, token, [this](QString role) 
+{
+    if (role == "admin") {
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    }
+    else if (role == "student") {
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
+        checkStudentFines(); // Triggers the bell check
+    }
+            currentRole = role;
+        }); // This closes the firestoreClient->getUserRole callback (Line 69)
+    }); // ADD THIS to close the authManager->loginUser callback
+}   // ADD THIS to close the void MainWindow::on_loginButton_clicked() function
+
 ///////////////////////////////////////////////////////////
 // REGISTER PAGE OPEN
 // REGISTER PAGE OPEN
@@ -83,7 +77,7 @@ void MainWindow::on_loginButton_clicked()
 
 void MainWindow::on_openRegisterButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->registerPage);
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -92,7 +86,7 @@ void MainWindow::on_openRegisterButton_clicked()
 
 void MainWindow::on_backToLoginButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -180,11 +174,11 @@ void MainWindow::openDashboard(QString role)
 {
     if(role == "admin")
     {
-        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     }
     else
     {
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
     }
     currentRole = role;
 }
@@ -201,7 +195,7 @@ void MainWindow::on_logoutStudent_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -216,7 +210,7 @@ void MainWindow::on_logoutAdmin_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 void MainWindow::on_sidebar_btn_clicked()
@@ -229,13 +223,13 @@ void MainWindow::on_sidebar_btn_clicked()
 
 void MainWindow::on_addBooks_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
 void MainWindow::handleSharedAction() {
-    if(currentRole=="admin") ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-    else ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+    if(currentRole=="admin") ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 //////////////////////////////////////////////////////////////
 // OPEN USER MONITORING PAGE
@@ -243,7 +237,7 @@ void MainWindow::handleSharedAction() {
 
 void MainWindow::on_userMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->userMonitoringPage);
+    ui->stackedWidget->setCurrentWidget(ui->userMonitoringPage);
 
 
         // Fetch the books and send them to the table!
@@ -259,7 +253,7 @@ void MainWindow::on_userMonitoring_btn_clicked()
 
 void MainWindow::on_backFromMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
 }
 
 void MainWindow::on_notificationBell_clicked()
@@ -377,7 +371,7 @@ void MainWindow::on_addBook_btn_clicked()
     book.description = ui->textEdit_description->toPlainText();
     book.rating      = ui->doubleSpinBox_rating->value();
     book.section     = ui->lineEdit_section->text();
-    book.available   = ui->spinBox_qty->value();
+    book.available   = ui->checkBox->isChecked();
 
     firestoreClient->addBook(book, currentToken,
                             [this](QString docId)
@@ -394,7 +388,7 @@ void MainWindow::on_addBook_btn_clicked()
 
 void MainWindow::on_profile_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->profile_page);
+    ui->stackedWidget->setCurrentWidget(ui->profile_page);
 
 firestoreClient->getUserInfo(currentUID, currentToken,
                                 [this](UserInfo info)
@@ -451,12 +445,12 @@ void MainWindow::on_change_name_btn_clicked()
 }
 
 // This function is triggered when the "Back" button on the Book View Page is clicked.
-// It switches the stackedwidget back to the student dashboard page.
+// It switches the stackedWidget back to the student dashboard page.
 void MainWindow::on_backButton_clicked()
 {
     // stackedWidget contains all the pages of the application.
     // setCurrentWidget() changes the visible page.
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 
 
@@ -466,370 +460,24 @@ void MainWindow::bookViewPage(QString title,
                               QString author,
                               QString category,
                               QString rating,
-                              QString description,
-                              QIcon coverIcon) // <--- ADD THIS
+                              QString description)
 {
+    // Set the book title label with the title passed to the function
     ui->bookTitleLabel->setText(title);
+
+    // Set the author label
     ui->bookAuthorLabel->setText(author);
+
+    // Set the category label
     ui->bookCategoryLabel->setText(category);
+
+    // Set the rating label
     ui->bookRatingLabel->setText(rating);
+
+    // Set the book description text box
     ui->bookDescriptionText->setText(description);
 
-    // --- NEW: Set the image ---
-    // Extract a nice big pixmap from the icon to fit your label
-    QPixmap coverPixmap = coverIcon.pixmap(250, 350);
-    ui->bookImage_label->setPixmap(coverPixmap);
-    // Ensure the image stretches to fit the label bounds properly
-    ui->bookImage_label->setScaledContents(true);
-    // --------------------------
-
-    ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
-}
-
-void MainWindow::on_update_btn_clicked()
-{
-    if (selectedBookId.isEmpty()) {
-        QMessageBox::warning(this, "No Book Selected",
-                             "Please click a book in the table first.");
-        return;
-    }
-
-    Book book;
-    book.id          = selectedBookId;           // ← comes from row click
-    book.title       = ui->bookName_in->text();
-    book.author      = ui->author_in->text();
-    book.category    = ui->categ_in->text();
-    book.coverUrl    = ui->lineEdit_coverUrl->text();
-    book.description = ui->textEdit_description->toPlainText();
-    book.rating      = ui->doubleSpinBox_rating->value();
-    book.section     = ui->lineEdit_section->text();
-    book.available   = ui->spinBox_qty->value();
-
-    firestoreClient->updateBook(book, currentToken, [this](bool success) {
-        if (success) {
-            QMessageBox::information(this, "Success", "Book updated.");
-
-            selectedBookId.clear();
-        } else {
-            QMessageBox::warning(this, "Failed", "Could not update book.");
-        }
-    });
-}
-
-
-void MainWindow::on_remove_btn_clicked()
-{
-
-    if (selectedBookId.isEmpty()) {
-        QMessageBox::warning(this, "No Book Selected",
-                             "Please click a book in the table first.");
-        return;
-    }
-
-    // Confirm before deleting
-    auto confirm = QMessageBox::question(
-        this, "Confirm Delete",
-        "Are you sure you want to remove this book?\n\n"
-            + ui->bookName_in->text(),
-        QMessageBox::Yes | QMessageBox::No
-        );
-    if (confirm != QMessageBox::Yes) return;
-
-    firestoreClient->removeBook(selectedBookId, currentToken,
-                               [this](bool success)
-                               {
-                                   if (success) {
-                                       QMessageBox::information(this, "Removed", "Book removed.");
-
-                                       selectedBookId.clear();
-
-                                       // Clear the edit fields
-                                       ui->bookName_in->clear();
-                                       ui->author_in->clear();
-                                       ui->categ_in->clear();
-                                       ui->label_selectedBook->setText("No book selected.");
-                                   } else {
-                                       QMessageBox::warning(this, "Failed", "Could not remove book.");
-                                   }
-                               });
-
-}
-
-
-void MainWindow::on_inventory_btn_clicked()
-{
-    ui->stackedwidget->setCurrentWidget(ui->inventory);
-    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
-                                {
-                                    ui->tableWidget_books->setRowCount(0);
-                                    ui->tableWidget_books->setColumnCount(9);
-                                    ui->tableWidget_books->setHorizontalHeaderLabels(
-                                        {"", "Title", "Author", "Category", "Rating", "Available","Description","Section","Cover URL"});
-
-                                    // Hide column 0 — it holds the document ID invisibly
-                                    ui->tableWidget_books->setColumnHidden(0, true);
-
-                                    for (const Book &b : books)
-                                    {
-                                        int row = ui->tableWidget_books->rowCount();
-                                        ui->tableWidget_books->insertRow(row);
-
-                                        // Column 0 (hidden) — stores the document ID
-                                        ui->tableWidget_books->setItem(row, 0,
-                                                                       new QTableWidgetItem(b.id));
-
-                                        // Visible columns
-                                        ui->tableWidget_books->setItem(row, 1,
-                                                                       new QTableWidgetItem(b.title));
-                                        ui->tableWidget_books->setItem(row, 2,
-                                                                       new QTableWidgetItem(b.author));
-                                        ui->tableWidget_books->setItem(row, 3,
-                                                                       new QTableWidgetItem(b.category));
-                                        ui->tableWidget_books->setItem(row, 4,
-                                                                       new QTableWidgetItem(QString::number(b.rating)));
-                                        ui->tableWidget_books->setItem(row, 5,
-                                                                       new QTableWidgetItem(QString::number(b.available)));
-                                        ui->tableWidget_books->setItem(row, 6,
-                                                                       new QTableWidgetItem(b.description));
-                                        ui->tableWidget_books->setItem(row, 7,
-                                                                      new QTableWidgetItem(b.section));
-                                        ui->tableWidget_books->setItem(row, 8,
-                                                                      new QTableWidgetItem(b.coverUrl));
-                                    }
-                                });
-}
-
-
-
-void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
-{
-    selectedBookId = ui->tableWidget_books->item(row, 0)->text();
-
-    // Auto-fill all edit fields so admin can modify and hit Update
-    Book b;
-    ui->bookName_in->setText(
-        ui->tableWidget_books->item(row, 1)->text());
-    ui->author_in->setText(
-        ui->tableWidget_books->item(row, 2)->text());
-    ui->categ_in->setText(
-        ui->tableWidget_books->item(row, 3)->text());
-    ui->doubleSpinBox_rating->setValue(
-        (ui->tableWidget_books->item(row, 4)->text()).toDouble());
-    ui->spinBox_qty->setValue(
-        (ui->tableWidget_books->item(row, 5)->text()).toInt());
-    ui->textEdit_description->setText(
-        ui->tableWidget_books->item(row, 6)->text());
-    ui->lineEdit_section->setText(
-        ui->tableWidget_books->item(row, 7)->text());
-    ui->lineEdit_coverUrl->setText(
-        ui->tableWidget_books->item(row, 8)->text());
-
-    // Show which book is selected
-    ui->label_selectedBook->setText(
-        "Selected: " + ui->tableWidget_books->item(row, 1)->text()
-        + "  [ID: " + selectedBookId + "]");
-
-    qDebug() << "Selected book ID:" << selectedBookId;
-}
-
-
-void MainWindow::on_update_to_add_btn_clicked()
-{
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
-}
-
-
-// --- Navigation ---
-
-void MainWindow::on_search_btn_clicked()
-{
-    // Switch the stacked widget to the Search Page
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
-
-    // Fetch the live inventory from Firestore and pass it to the grid
-    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books) {
-        populateBookGrid(books);
-    });
-}
-
-void MainWindow::on_backFromSearch_btn_clicked()
-{
-    // Switch back to the admin dashboard
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-}
-
-// --- Live Search & Filter Logic ---
-
-void MainWindow::on_searchLineEdit_textChanged(const QString &arg1)
-{
-    // Trigger the filter whenever a letter is typed or deleted
-    filterBooks();
-}
-
-void MainWindow::on_genreFilterCombo_currentTextChanged(const QString &arg1)
-{
-    // Trigger the filter whenever a new genre is selected
-    filterBooks();
-}
-
-void MainWindow::filterBooks()
-{
-    // 1. Get the search text, converted to lowercase for case-insensitive matching
-    QString searchText = ui->searchLineEdit->text().toLower();
-
-    // 2. Get the currently selected genre
-    QString selectedGenre = ui->genreFilterCombo->currentText();
-
-    // 3. Loop through every item in the cover grid
-    for (int i = 0; i < ui->bookCoverGrid->count(); ++i) {
-
-        QListWidgetItem *item = ui->bookCoverGrid->item(i);
-        if (!item) continue;
-
-        // Get the title (this is the visible text under the icon)
-        QString title = item->text().toLower();
-
-        // Retrieve the hidden Author and Genre data we saved inside the item
-        QString author = item->data(Qt::UserRole + 1).toString().toLower();
-        QString genre = item->data(Qt::UserRole + 2).toString();
-
-        // Check if the title OR the author contains the typed letters
-        bool matchesSearch = title.contains(searchText) || author.contains(searchText);
-
-        // THE FIX: Convert selectedGenre to lowercase just for the "All Genres" check
-        bool matchesGenre = (selectedGenre.toLower() == "all genres") || (genre == selectedGenre);
-
-        // 4. Show or hide the icon based on the filters
-        if (matchesSearch && matchesGenre) {
-            item->setHidden(false); // Show it
-        } else {
-            item->setHidden(true);  // Hide it
-        }
-    }
-}
-
-
-void MainWindow::populateBookGrid(QList<Book> books)
-{
-    ui->bookCoverGrid->clear();
-    ui->genreFilterCombo->clear();
-    ui->genreFilterCombo->addItem("All genres");
-    QStringList genresLoaded;
-
-    ui->bookCoverGrid->setIconSize(QSize(100, 150));
-    ui->bookCoverGrid->setGridSize(QSize(140, 200));
-
-    // Create a network manager to handle all the image downloads
-    QNetworkAccessManager *imageManager = new QNetworkAccessManager(this);
-
-    for (const Book &b : books) {
-
-        // 1. Keep the grey placeholder so the grid loads instantly
-        QPixmap placeholderCover(100, 150);
-        placeholderCover.fill(QColor("#DCE1E6"));
-        QListWidgetItem *bookItem = new QListWidgetItem(QIcon(placeholderCover), b.title);
-
-        bookItem->setForeground(QBrush(Qt::black));
-        bookItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-
-        bookItem->setData(Qt::UserRole, b.id);
-        bookItem->setData(Qt::UserRole + 1, b.author.toLower());
-        bookItem->setData(Qt::UserRole + 2, b.category);
-        bookItem->setData(Qt::UserRole + 3, QString::number(b.rating));
-        bookItem->setData(Qt::UserRole + 4, b.description);
-
-        ui->bookCoverGrid->addItem(bookItem);
-
-        if (!genresLoaded.contains(b.category) && !b.category.isEmpty()) {
-            genresLoaded.append(b.category);
-            ui->genreFilterCombo->addItem(b.category);
-        }
-
-        // ---------------------------------------------------------
-        // 2. NEW: Download the actual image in the background!
-        // ---------------------------------------------------------
-        if (!b.coverUrl.isEmpty() && b.coverUrl.startsWith("http")) {
-            QNetworkRequest request((QUrl(b.coverUrl)));
-            QNetworkReply *reply = imageManager->get(request);
-
-            // When this specific image finishes downloading, update the icon
-            connect(reply, &QNetworkReply::finished, [reply, bookItem]() {
-                if (reply->error() == QNetworkReply::NoError) {
-                    QByteArray imageData = reply->readAll();
-                    QPixmap pixmap;
-                    if (pixmap.loadFromData(imageData)) {
-                        // Scale the image so it fits the 100x150 slot perfectly without stretching
-                        QPixmap scaledPixmap = pixmap.scaled(100, 150, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-                        bookItem->setIcon(QIcon(scaledPixmap));
-                    }
-                }
-                reply->deleteLater();
-            });
-        }
-    }
-}
-
-void MainWindow::on_bookCoverGrid_itemClicked(QListWidgetItem *item)
-{
-    // 1. Extract the visible text (Title)
-    QString title = item->text();
-
-    // 2. Extract the hidden data
-    QString author      = item->data(Qt::UserRole + 1).toString();
-    QString category    = item->data(Qt::UserRole + 2).toString();
-    QString rating      = item->data(Qt::UserRole + 3).toString();
-    QString description = item->data(Qt::UserRole + 4).toString();
-
-    // 3. Grab the actual image we downloaded for the grid
-    QIcon coverIcon = item->icon();
-
-    // 4. Pass ALL 6 items to your view page (Notice coverIcon is at the end!)
-    bookViewPage(title, author, category, rating, description, coverIcon);
-}
-void MainWindow::on_browseImage_btn_clicked()
-{
-    // Open a file dialog to let the user pick an image
-    QString imagePath = QFileDialog::getOpenFileName(this, "Select Book Cover", "", "Images (*.png *.jpg *.jpeg)");
-
-    if (imagePath.isEmpty()) return; // User canceled
-
-    // Temporarily disable the Add button so they don't submit before the upload finishes
-    ui->addBook_btn->setEnabled(false);
-    ui->lineEdit_coverUrl->setText("Uploading...");
-
-    firestoreClient->uploadImageToCloudinary(imagePath, [this](QString url) {
-        if (!url.isEmpty()) {
-            // Put the final URL into the text box so your existing addBook function can grab it!
-            ui->lineEdit_coverUrl->setText(url);
-        } else {
-            ui->lineEdit_coverUrl->setText("Upload Failed");
-        }
-        ui->addBook_btn->setEnabled(true);
-    });
-}
-
-void MainWindow::on_forgotPassword_btn_clicked()
-{
-    QMessageBox msgBox(this);
-    msgBox.setWindowTitle("Password Reset");
-    msgBox.setText("<b>Account Locked / Forgot Password</b>");
-    msgBox.setInformativeText("Because PocketLib uses internal Library IDs, automated email resets are disabled.\n\n"
-                              "Please visit the Library Help Desk or contact the System Administrator to verify your identity and reset your password.");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setStandardButtons(QMessageBox::Ok);
-
-    msgBox.exec();
-}
-
-void MainWindow::on_changepsd_btn_clicked()
-{
-    QMessageBox msgBox(this);
-    msgBox.setWindowTitle("Change Password");
-    msgBox.setText("<b>Password Change Restricted</b>");
-    msgBox.setInformativeText("Because PocketLib uses internal Library IDs, automated password changes are currently disabled in the app.\n\n"
-                              "Please contact the System Administrator or visit the Library Help Desk to request a new password.");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setStandardButtons(QMessageBox::Ok);
-
-    msgBox.exec();
+    // Change the current visible page of the stackedWidget
+    // to the Book View Page so the user can see the details
+    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 }
