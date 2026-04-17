@@ -9,6 +9,10 @@
 #include <QList>
 #include "Book.h"
 #include "UserInfo.h"
+#include <QHttpMultiPart>
+#include <QHttpPart>
+#include <QFile>
+#include <QFileInfo>
 
 class FirestoreClient : public QObject
 {
@@ -45,13 +49,22 @@ public:
     //delete book function
     void deleteBook(QString documentId, QString idToken);
 
-
-
     void fetchBorrowedBooks(QString token, std::function<void(QJsonArray)> callback);
 
     void updateFineInFirestore(QString uid, int fineAmount, QString token);
 
     void getFineAmount(QString uid, QString token, std::function<void(int)> callback);
+
+    void updateBook(const Book &book, const QString &token,
+                    std::function<void(bool success)> callback);
+
+    void removeBook(const QString &bookId, const QString &token,
+                    std::function<void(bool success)> callback);
+
+    void getAllBooks(const QString &token,
+                     std::function<void(QList<Book> books)> callback);
+
+    void uploadImageToCloudinary(const QString &localFilePath, std::function<void(QString secureUrl)> callback);
 
 signals:
     void requestError(QString errorMessage);
