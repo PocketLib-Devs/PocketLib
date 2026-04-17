@@ -281,7 +281,7 @@ QPushButton:hover {
               <string>Search</string>
              </property>
             </widget>
-            <widget class="QPushButton" name="hamburgerButton">
+            <widget class="QPushButton" name="hamburger_btn">
              <property name="geometry">
               <rect>
                <x>0</x>
@@ -325,7 +325,7 @@ QPushButton:hover {
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="seeMoreNew">
+               <widget class="QPushButton" name="seeMoreNew_btn">
                 <property name="maximumSize">
                  <size>
                   <width>100</width>
@@ -333,7 +333,7 @@ QPushButton:hover {
                  </size>
                 </property>
                 <property name="text">
-                 <string>See More..</string>
+                 <string>See More →</string>
                 </property>
                </widget>
               </item>
@@ -370,7 +370,7 @@ QPushButton:hover {
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="seeMoreTop">
+               <widget class="QPushButton" name="seeMoreTopRated_btn">
                 <property name="maximumSize">
                  <size>
                   <width>100</width>
@@ -378,7 +378,7 @@ QPushButton:hover {
                  </size>
                 </property>
                 <property name="text">
-                 <string>See More..</string>
+                 <string>See More →</string>
                 </property>
                </widget>
               </item>
@@ -415,7 +415,7 @@ QPushButton:hover {
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="seeMoreRec">
+               <widget class="QPushButton" name="seeMoreRecommended_btn">
                 <property name="maximumSize">
                  <size>
                   <width>100</width>
@@ -423,7 +423,7 @@ QPushButton:hover {
                  </size>
                 </property>
                 <property name="text">
-                 <string>See More..</string>
+                 <string>See More →</string>
                 </property>
                </widget>
               </item>
@@ -973,7 +973,7 @@ QPushButton:hover {
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>☰</string>
         </property>
        </widget>
        <widget class="QWidget" name="gridLayoutWidget">

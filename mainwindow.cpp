@@ -9,6 +9,11 @@
 #include <QFileDialog>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPixmap>
+#include <QUrl>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +27,21 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_3, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
+    connect(ui->seeMoreNew_btn, &QPushButton::clicked, this, [this]() {
+        currentDashboardFilter = "new";
+        openFilteredPage();
+    });
+
+    connect(ui->seeMoreTopRated_btn, &QPushButton::clicked, this, [this]() {
+        currentDashboardFilter = "top";
+        openFilteredPage();
+    });
+
+    connect(ui->seeMoreRecommended_btn, &QPushButton::clicked, this, [this]() {
+        currentDashboardFilter = "recommended";
+        openFilteredPage();
+    });
+
     // Start app at login screen
     ui->stackedwidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
@@ -32,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->genreFilterCombo->addItem("Sci-Fi");
     ui->genreFilterCombo->addItem("Engineering");
     ui->forgotPassword_btn->hide();
+
+    connect(ui->dashboardSearch, &QLineEdit::textChanged,
+            this, &MainWindow::handleDashboardSearch);
+
 }
 
 MainWindow::~MainWindow()
@@ -655,8 +679,10 @@ void MainWindow::on_search_btn_clicked()
 
 void MainWindow::on_backFromSearch_btn_clicked()
 {
-    // Switch back to the admin dashboard
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    if (currentRole == "admin")
+        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    else
+        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
 }
 
 // --- Live Search & Filter Logic ---
@@ -868,41 +894,123 @@ void MainWindow::loadStudentDashboard()
 
 void MainWindow::populateSection(QHBoxLayout *layout, QList<Book> books)
 {
-    // Clear old items
+    // 🔹 Clear old items
     QLayoutItem *child;
     while ((child = layout->takeAt(0)) != nullptr) {
         delete child->widget();
         delete child;
     }
 
+    if (books.isEmpty()) {
+        QLabel *empty = new QLabel("No books available");
+        empty->setStyleSheet(R"(
+    color: gray;
+    font-size: 12px;
+    padding: 10px;
+)");
+        empty->setAlignment(Qt::AlignCenter);
+
+        layout->addWidget(empty);
+        layout->addStretch();
+        return;
+    }
+
+    // 🔹 Layout styling
+    layout->setSpacing(15);
+    layout->setContentsMargins(10, 5, 10, 5);
+
     for (const Book &b : books)
     {
+        // 🔹 Card container
         QWidget *card = new QWidget();
-        card->setFixedSize(120, 180);
-        card->setStyleSheet("background:#EAEAEA; border-radius:8px;");
+        card->setFixedSize(120, 200);
+        card->setCursor(Qt::PointingHandCursor);
+
+        card->setStyleSheet(R"(
+    QWidget {
+        background: white;
+        border-radius: 12px;
+    }
+    QWidget:hover {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+    }
+)");
 
         QVBoxLayout *v = new QVBoxLayout(card);
+        v->setSpacing(5);
 
+        // Cover Image
+        QLabel *cover = new QLabel();
+        cover->setFixedSize(100, 140);
+        cover->setAlignment(Qt::AlignCenter);
+
+        QPixmap placeholder(100, 140);
+        placeholder.fill(Qt::lightGray);
+        cover->setPixmap(placeholder);
+        cover->setScaledContents(true);
+
+        // Title
         QLabel *title = new QLabel(b.title);
         title->setWordWrap(true);
         title->setAlignment(Qt::AlignCenter);
+        title->setStyleSheet("font-size: 11px; color: black;");
 
-        v->addStretch();
+        v->addWidget(cover);
         v->addWidget(title);
 
         layout->addWidget(card);
 
-        // 👇 CLICK HANDLER
-        card->installEventFilter(this);
-
+        // Store data for click
         card->setProperty("title", b.title);
         card->setProperty("author", b.author);
         card->setProperty("category", b.category);
         card->setProperty("rating", QString::number(b.rating));
         card->setProperty("description", b.description);
+
+        // Enable click
+        card->installEventFilter(this);
+
+        // Load image from URL (async)
+        if (!b.coverUrl.isEmpty() && b.coverUrl.startsWith("http"))
+        {
+            QNetworkAccessManager *manager = new QNetworkAccessManager(card);
+
+            QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(b.coverUrl)));
+
+            connect(reply, &QNetworkReply::finished, [reply, cover, card]() {
+                if (reply->error() == QNetworkReply::NoError)
+                {
+                    QByteArray data = reply->readAll();
+
+                    QPixmap pix;
+                    pix.loadFromData(data);
+
+                    QPixmap scaled = pix.scaled(
+                        100, 140,
+                        Qt::KeepAspectRatioByExpanding,
+                        Qt::SmoothTransformation
+                        );
+
+                    cover->setPixmap(scaled);
+
+                    // ✅ STORE IMAGE IN CARD
+                    card->setProperty("coverPixmap", scaled);
+
+                    if (pix.isNull()) {
+                        pix = QPixmap(100,140);
+                        pix.fill(Qt::lightGray);
+                    }
+                }
+                reply->deleteLater();
+            });
+        }
     }
 
-    layout->addStretch(); // keeps left aligned
+    // 🔹 Push items to left
+    layout->addStretch();
+
+
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -910,23 +1018,93 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress)
     {
         QWidget *card = qobject_cast<QWidget*>(obj);
+
         if (card)
         {
             QString title = card->property("title").toString();
 
             if (!title.isEmpty())
             {
+                //  GET IMAGE FROM PROPERTY
+                QPixmap pix = card->property("coverPixmap").value<QPixmap>();
+                QIcon icon(pix);
+
                 bookViewPage(
                     card->property("title").toString(),
                     card->property("author").toString(),
                     card->property("category").toString(),
                     card->property("rating").toString(),
                     card->property("description").toString(),
-                    QIcon() // optional for now
+                    icon
                     );
+
                 return true;
             }
         }
     }
+
     return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::openFilteredPage()
+{
+    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+
+    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
+                                 {
+                                     QList<Book> filtered;
+
+                                     for (const Book &b : books)
+                                     {
+                                         if (currentDashboardFilter == "new")
+                                         {
+                                             filtered.append(b); // or improve later
+                                         }
+                                         else if (currentDashboardFilter == "top")
+                                         {
+                                             if (b.rating >= 4.5)
+                                                 filtered.append(b);
+                                         }
+                                         else if (currentDashboardFilter == "recommended")
+                                         {
+                                             if (b.category == "Engineering") // temp logic
+                                                 filtered.append(b);
+                                         }
+                                     }
+
+                                     populateBookGrid(filtered);
+                                 });
+}
+
+void MainWindow::handleDashboardSearch(const QString &text)
+{
+    // If search is empty → go back to dashboard
+    if (text.trimmed().isEmpty()) {
+        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        loadStudentDashboard();
+        return;
+    }
+
+    // Otherwise open search page
+    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+
+    // Fetch and filter
+    firestoreClient->getAllBooks(currentToken, [this, text](QList<Book> books)
+                                 {
+                                     QList<Book> filtered;
+
+                                     QString query = text.toLower();
+
+                                     for (const Book &b : books)
+                                     {
+                                         if (b.title.toLower().contains(query) ||
+                                             b.author.toLower().contains(query) ||
+                                             b.category.toLower().contains(query))
+                                         {
+                                             filtered.append(b);
+                                         }
+                                     }
+
+                                     populateBookGrid(filtered);
+                                 });
 }

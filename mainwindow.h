@@ -7,10 +7,14 @@
 #include <QListWidgetItem>
 #include <QIcon>
 #include <QHBoxLayout>
+#include <QPixmap>
+#include <QVariant>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+Q_DECLARE_METATYPE(QPixmap)
 
 class MainWindow : public QMainWindow
 {
@@ -72,6 +76,8 @@ private slots:
     void on_forgotPassword_btn_clicked();
     void on_changepsd_btn_clicked();
 
+    void handleDashboardSearch(const QString &text);
+
 
 private:
     Ui::MainWindow *ui;
@@ -80,6 +86,8 @@ private:
     QString currentRole;
 
     QString selectedBookId;
+
+    QString currentDashboardFilter;
 
     AuthManager *authManager;
     FirestoreClient *firestoreClient;
@@ -95,6 +103,7 @@ private:
 
     void loadStudentDashboard();
     void populateSection(QHBoxLayout *layout, QList<Book> books);
+    void openFilteredPage();
 
 
 protected:
