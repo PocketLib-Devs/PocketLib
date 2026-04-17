@@ -71,6 +71,7 @@ void MainWindow::on_loginButton_clicked()
                                                                 else if (role == "student") {
                                                                     ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
                                                                     checkStudentFines(); // Triggers the bell check
+                                                                    loadStudentDashboard();
                                                                 }
                                                                 currentRole = role;
                                                             });
@@ -832,4 +833,100 @@ void MainWindow::on_changepsd_btn_clicked()
     msgBox.setStandardButtons(QMessageBox::Ok);
 
     msgBox.exec();
+}
+
+void MainWindow::loadStudentDashboard()
+{
+    firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
+                                 {
+                                     QList<Book> newBooks;
+                                     QList<Book> topRated;
+                                     QList<Book> recommended;
+
+                                     for (const Book &b : books)
+                                     {
+                                         // Simple logic (you can improve later)
+
+                                         // New books (latest added)
+                                         newBooks.append(b);
+
+                                         // Top rated
+                                         if (b.rating >= 4.5)
+                                             topRated.append(b);
+
+                                         // Recommendation (example: category match)
+                                         if (b.category == "Romance")
+                                             recommended.append(b);
+                                     }
+
+                                     // Limit items (UI looks clean)
+                                     populateSection(ui->newBooksLayout, newBooks.mid(0, 6));
+                                     populateSection(ui->topRatedLayout, topRated.mid(0, 6));
+                                     populateSection(ui->recommendedLayout, recommended.mid(0, 6));
+                                 });
+}
+
+void MainWindow::populateSection(QHBoxLayout *layout, QList<Book> books)
+{
+    // Clear old items
+    QLayoutItem *child;
+    while ((child = layout->takeAt(0)) != nullptr) {
+        delete child->widget();
+        delete child;
+    }
+
+    for (const Book &b : books)
+    {
+        QWidget *card = new QWidget();
+        card->setFixedSize(120, 180);
+        card->setStyleSheet("background:#EAEAEA; border-radius:8px;");
+
+        QVBoxLayout *v = new QVBoxLayout(card);
+
+        QLabel *title = new QLabel(b.title);
+        title->setWordWrap(true);
+        title->setAlignment(Qt::AlignCenter);
+
+        v->addStretch();
+        v->addWidget(title);
+
+        layout->addWidget(card);
+
+        // 👇 CLICK HANDLER
+        card->installEventFilter(this);
+
+        card->setProperty("title", b.title);
+        card->setProperty("author", b.author);
+        card->setProperty("category", b.category);
+        card->setProperty("rating", QString::number(b.rating));
+        card->setProperty("description", b.description);
+    }
+
+    layout->addStretch(); // keeps left aligned
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QWidget *card = qobject_cast<QWidget*>(obj);
+        if (card)
+        {
+            QString title = card->property("title").toString();
+
+            if (!title.isEmpty())
+            {
+                bookViewPage(
+                    card->property("title").toString(),
+                    card->property("author").toString(),
+                    card->property("category").toString(),
+                    card->property("rating").toString(),
+                    card->property("description").toString(),
+                    QIcon() // optional for now
+                    );
+                return true;
+            }
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
 }

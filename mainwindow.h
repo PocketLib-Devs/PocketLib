@@ -6,6 +6,7 @@
 #include "firestore/FirestoreClient.h"
 #include <QListWidgetItem>
 #include <QIcon>
+#include <QHBoxLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -92,6 +93,14 @@ private:
     void filterBooks();
     void populateBookGrid(QList<Book> books);
 
+    void loadStudentDashboard();
+    void populateSection(QHBoxLayout *layout, QList<Book> books);
+
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 };
+
 
 #endif
