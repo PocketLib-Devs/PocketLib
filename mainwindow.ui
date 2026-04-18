@@ -54,7 +54,7 @@ QPushButton:pressed {
     <item>
      <widget class="QStackedWidget" name="stackedwidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="loginPage">
        <layout class="QGridLayout" name="gridLayout_5">
@@ -614,9 +614,16 @@ QPushButton:hover {
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="addToMyBooksButton">
+          <widget class="QPushButton" name="addToMyBooks_btn">
            <property name="text">
             <string>ADD TO MY BOOKS</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="rmbook_btn">
+           <property name="text">
+            <string>REMOVE FROM MY BOOKS</string>
            </property>
           </widget>
          </item>
@@ -629,6 +636,20 @@ QPushButton:hover {
          </item>
         </layout>
        </widget>
+      </widget>
+      <widget class="QWidget" name="myBooksPage">
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="QListWidget" name="myBooksGrid"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="back_btn_4">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="adminDashboardPage">
        <widget class="QPushButton" name="sidebar_btn">

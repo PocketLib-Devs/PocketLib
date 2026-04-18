@@ -66,6 +66,17 @@ public:
 
     void uploadImageToCloudinary(const QString &localFilePath, std::function<void(QString secureUrl)> callback);
 
+    void addToMyBooks(const QString &uid, const Book &book,
+                     const QString &token,
+                     std::function<void(bool)> callback);
+
+    void getMyBooks(const QString &uid, const QString &token,
+                   std::function<void(QList<Book>)> callback);
+
+    void removeFromMyBooks(const QString &uid, const QString &bookId,
+                          const QString &token,
+                          std::function<void(bool)> callback);
+
 signals:
     void requestError(QString errorMessage);
     void requestSuccess(QString successMessage);

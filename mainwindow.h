@@ -6,6 +6,7 @@
 #include "firestore/FirestoreClient.h"
 #include <QListWidgetItem>
 #include <QIcon>
+#include <QSet>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,7 +24,8 @@ public:
                       QString category,
                       QString rating,
                       QString description,
-                      QIcon coverIcon);
+                      QIcon coverIcon,
+                      QString bookId, QString coverUrl, QString Qty);
 
 private slots:
 
@@ -72,6 +74,16 @@ private slots:
     void on_changepsd_btn_clicked();
 
 
+    void on_addToMyBooks_btn_clicked();
+
+    void on_myBooks_btn_clicked();
+
+    void on_myBooksGrid_itemClicked(QListWidgetItem *item);
+
+    void on_rmbook_btn_clicked();
+
+    void on_View_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -91,6 +103,11 @@ private:
     void processMockPayment(int amount);
     void filterBooks();
     void populateBookGrid(QList<Book> books);
+    QString     currentBookId;
+    QString     currentCoverUrl;
+    QSet<QString> savedBookIds;
+    void on_myBooksGrid_customContextMenuRequested(const QPoint &pos);
+    void loadMyBooksGrid();
 
 };
 
