@@ -72,7 +72,9 @@ private slots:
     void on_browseImage_btn_clicked();
     void on_forgotPassword_btn_clicked();
     void on_changepsd_btn_clicked();
-
+    void on_pushButton_clicked();
+    void on_checkout_back_btn_clicked();
+    void on_checkout_issue_btn_clicked();
 
     void on_addToMyBooks_btn_clicked();
 

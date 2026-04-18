@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->back_btn_4, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     // Start app at login screen
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(this);
     firestoreClient = new FirestoreClient(this);
@@ -68,10 +68,10 @@ void MainWindow::on_loginButton_clicked()
                                firestoreClient->getUserRole(uid, token, [this](QString role)
                                                             {
                                                                 if (role == "admin") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+                                                                    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
                                                                 }
                                                                 else if (role == "student") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+                                                                    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
                                                                     checkStudentFines(); // Triggers the bell check
                                                                 }
                                                                 currentRole = role;
@@ -85,7 +85,7 @@ void MainWindow::on_loginButton_clicked()
 
 void MainWindow::on_openRegisterButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->registerPage);
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void MainWindow::on_openRegisterButton_clicked()
 
 void MainWindow::on_backToLoginButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -182,11 +182,11 @@ void MainWindow::openDashboard(QString role)
 {
     if(role == "admin")
     {
-        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     }
     else
     {
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
     }
     currentRole = role;
 }
@@ -203,7 +203,7 @@ void MainWindow::on_logoutStudent_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -218,7 +218,7 @@ void MainWindow::on_logoutAdmin_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 void MainWindow::on_sidebar_btn_clicked()
@@ -231,13 +231,13 @@ void MainWindow::on_sidebar_btn_clicked()
 
 void MainWindow::on_addBooks_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
 void MainWindow::handleSharedAction() {
-    if(currentRole=="admin") ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-    else ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+    if(currentRole=="admin") ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 //////////////////////////////////////////////////////////////
 // OPEN USER MONITORING PAGE
@@ -245,7 +245,7 @@ void MainWindow::handleSharedAction() {
 
 void MainWindow::on_userMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->userMonitoringPage);
+    ui->stackedWidget->setCurrentWidget(ui->userMonitoringPage);
 
 
         // Fetch the books and send them to the table!
@@ -261,7 +261,7 @@ void MainWindow::on_userMonitoring_btn_clicked()
 
 void MainWindow::on_backFromMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
 }
 
 void MainWindow::on_notificationBell_clicked()
@@ -396,7 +396,7 @@ void MainWindow::on_addBook_btn_clicked()
 
 void MainWindow::on_profile_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->profile_page);
+    ui->stackedWidget->setCurrentWidget(ui->profile_page);
 
 firestoreClient->getUserInfo(currentUID, currentToken,
                                 [this](UserInfo info)
@@ -453,12 +453,12 @@ void MainWindow::on_change_name_btn_clicked()
 }
 
 // This function is triggered when the "Back" button on the Book View Page is clicked.
-// It switches the stackedwidget back to the student dashboard page.
+// It switches the stackedWidget back to the student dashboard page.
 void MainWindow::on_backButton_clicked()
 {
     // stackedWidget contains all the pages of the application.
     // setCurrentWidget() changes the visible page.
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 }
 
 
@@ -486,6 +486,7 @@ void MainWindow::bookViewPage(QString title,
     // Ensure the image stretches to fit the label bounds properly
     ui->bookImage_label->setScaledContents(true);
     // --------------------------
+
     currentBookId  = bookId;
     currentCoverUrl = coverUrl;
 
@@ -508,6 +509,8 @@ void MainWindow::bookViewPage(QString title,
         ui->rmbook_btn->setVisible(false);
     }
     ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
+
+
 }
 
 void MainWindow::on_update_btn_clicked()
@@ -582,7 +585,7 @@ void MainWindow::on_remove_btn_clicked()
 
 void MainWindow::on_inventory_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->inventory);
+    ui->stackedWidget->setCurrentWidget(ui->inventory);
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
                                 {
                                     ui->tableWidget_books->setRowCount(0);
@@ -671,7 +674,7 @@ void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
 
 void MainWindow::on_update_to_add_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
@@ -680,7 +683,7 @@ void MainWindow::on_update_to_add_btn_clicked()
 void MainWindow::on_search_btn_clicked()
 {
     // Switch the stacked widget to the Search Page
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 
     // Fetch the live inventory from Firestore and pass it to the grid
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books) {
@@ -691,7 +694,7 @@ void MainWindow::on_search_btn_clicked()
 void MainWindow::on_backFromSearch_btn_clicked()
 {
     // Switch back to the admin dashboard
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
 }
 
 // --- Live Search & Filter Logic ---
@@ -1058,3 +1061,48 @@ void MainWindow::on_View_btn_clicked()
     ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
 }
 
+// 1. Navigation: Go to the checkout page from Admin Dashboard
+void MainWindow::on_pushButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->adminCheckoutPage);
+}
+
+// 2. Navigation: Go back
+void MainWindow::on_checkout_back_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+}
+
+// 3. The Main Execution
+void MainWindow::on_checkout_issue_btn_clicked()
+{
+    QString studentEmail = ui->checkout_studentEmail_in->text().trimmed();
+    QString bookId = ui->checkout_bookId_in->text().trimmed();
+
+    if(studentEmail.isEmpty() || bookId.isEmpty()) {
+        QMessageBox::warning(this, "Missing Data", "Please enter both the Student's Email and the Book ID.");
+        return;
+    }
+
+    // Disable the button to prevent double-clicking while waiting for Firebase
+    ui->checkout_issue_btn->setEnabled(false);
+    ui->checkout_issue_btn->setText("Processing...");
+
+    // Call the heavy lifter function we just created
+    firestoreClient->adminCheckoutBook(studentEmail, bookId, currentToken, currentUID,
+                                       [this](bool success, QString message) {
+
+                                           // Re-enable the button once Firebase replies
+                                           ui->checkout_issue_btn->setEnabled(true);
+                                           ui->checkout_issue_btn->setText("Issue Book to Student");
+
+                                           if(success) {
+                                               QMessageBox::information(this, "Checkout Successful", message);
+                                               // Clear the inputs for the next student in line
+                                               ui->checkout_studentEmail_in->clear();
+                                               ui->checkout_bookId_in->clear();
+                                           } else {
+                                               QMessageBox::warning(this, "Checkout Failed", message);
+                                           }
+                                       });
+}

@@ -44,9 +44,8 @@ public:
                         const QString &token,
                         std::function<void(bool success)> callback);
 
+    void adminCheckoutBook(QString studentLibraryId, QString bookId, QString token, QString adminUID, std::function<void(bool, QString)> callback);
 
-
-    //delete book function
     void deleteBook(QString documentId, QString idToken);
 
     void fetchBorrowedBooks(QString token, std::function<void(QJsonArray)> callback);
