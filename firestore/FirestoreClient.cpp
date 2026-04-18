@@ -681,3 +681,192 @@ void FirestoreClient::uploadImageToCloudinary(const QString &localFilePath, std:
         reply->deleteLater();
     });
 }
+void FirestoreClient::addToMyBooks(const QString &uid, const Book &book,
+                                   const QString &token,
+                                   std::function<void(bool)> callback)
+{
+    // Using the book's own ID as the document ID prevents duplicates automatically
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid
+                  + "/myBooks/" + book.id;
+
+    QNetworkRequest request((QUrl(url)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QJsonObject body;
+    body["fields"] = bookToFields(book);   // reuses your existing helper
+
+    QNetworkReply *reply = networkManager.sendCustomRequest(
+        request, "PATCH", QJsonDocument(body).toJson()
+        );
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
+        if (json.contains("error")) {
+            qDebug() << "addToMyBooks failed:"
+                     << json["error"].toObject()["message"].toString();
+            callback(false);
+        } else {
+            callback(true);
+        }
+        reply->deleteLater();
+    });
+}
+void FirestoreClient::getMyBooks(const QString &uid, const QString &token,
+                                 std::function<void(QList<Book>)> callback)
+{
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid + "/myBooks";
+
+    QNetworkRequest request((QUrl(url)));
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.get(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback, this]() {
+        QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
+        QList<Book> books;
+
+        if (!json.contains("error")) {
+            for (const QJsonValue &val : json["documents"].toArray()) {
+                QJsonObject doc = val.toObject();
+                books.append(fieldsToBook(doc["name"].toString(),
+                                          doc["fields"].toObject()));
+            }
+        } else {
+            qDebug() << "getMyBooks failed:"
+                     << json["error"].toObject()["message"].toString();
+        }
+
+        callback(books);
+        reply->deleteLater();
+    });
+}
+void FirestoreClient::removeFromMyBooks(const QString &uid, const QString &bookId,
+                                        const QString &token,
+                                        std::function<void(bool)> callback)
+{
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid
+                  + "/myBooks/" + bookId;
+
+    QNetworkRequest request((QUrl(url)));
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.deleteResource(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        callback(status == 200);
+          reply->deleteLater();
+    });
+}
+
+void FirestoreClient::adminCheckoutBook(QString studentLibraryId, QString bookId, QString token, QString adminUID, std::function<void(bool, QString)> callback)
+{
+    // STEP 1: Query the user by libraryId
+    QUrl queryUrl("https://firestore.googleapis.com/v1/projects/pocketlib-ea41d/databases/(default)/documents:runQuery");
+    QNetworkRequest request(queryUrl);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QJsonObject fieldFilter;
+    fieldFilter["field"] = QJsonObject{{"fieldPath", "libraryId"}};
+    fieldFilter["op"] = "EQUAL";
+    fieldFilter["value"] = QJsonObject{{"stringValue", studentLibraryId}};
+
+    QJsonObject whereObj{{"fieldFilter", fieldFilter}};
+    QJsonObject fromObj{{"collectionId", "users"}};
+    QJsonArray fromArray; fromArray.append(fromObj);
+
+    QJsonObject structuredQuery;
+    structuredQuery["from"] = fromArray;
+    structuredQuery["where"] = whereObj;
+    QJsonObject queryPayload{{"structuredQuery", structuredQuery}};
+
+    // Use the class's built-in networkManager
+    QNetworkReply *reply = networkManager.post(request, QJsonDocument(queryPayload).toJson());
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() != QNetworkReply::NoError) {
+            callback(false, "Network error while searching for user.");
+            reply->deleteLater(); return;
+        }
+
+        QJsonArray docs = QJsonDocument::fromJson(reply->readAll()).array();
+        if (docs.isEmpty() || !docs[0].toObject().contains("document")) {
+            callback(false, "Student Library ID not found in database.");
+            reply->deleteLater(); return;
+        }
+
+        QJsonObject userDoc = docs[0].toObject().value("document").toObject();
+        QString docName = userDoc.value("name").toString();
+        QString studentUID = docName.split("/").last();
+        QString studentName = userDoc.value("fields").toObject().value("name").toObject().value("stringValue").toString();
+
+        // STEP 2: Fetch the book to check stock
+        QUrl bookUrl("https://firestore.googleapis.com/v1/projects/pocketlib-ea41d/databases/(default)/documents/books/" + bookId);
+        QNetworkRequest bookReq(bookUrl);
+        bookReq.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+        // Use the class's built-in networkManager again
+        QNetworkReply *bookReply = networkManager.get(bookReq);
+
+        connect(bookReply, &QNetworkReply::finished, [=]() {
+            if (bookReply->error() != QNetworkReply::NoError) {
+                callback(false, "Book ID not found in database.");
+                bookReply->deleteLater(); return;
+            }
+
+            QJsonObject bookData = QJsonDocument::fromJson(bookReply->readAll()).object().value("fields").toObject();
+            int available = bookData.value("available").toObject().value("integerValue").toString().toInt();
+            QString bookTitle = bookData.value("title").toObject().value("stringValue").toString();
+
+            if (available <= 0) {
+                callback(false, "Book is currently out of stock!");
+                bookReply->deleteLater(); return;
+            }
+
+            // STEP 3: Write the new Borrow Record
+            QUrl borrowUrl("https://firestore.googleapis.com/v1/projects/pocketlib-ea41d/databases/(default)/documents/borrowed_books");
+            QNetworkRequest borrowReq(borrowUrl);
+            borrowReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+            borrowReq.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+            QJsonObject borrowFields;
+            borrowFields["bookId"] = QJsonObject{{"stringValue", bookId}};
+            borrowFields["bookName"] = QJsonObject{{"stringValue", bookTitle}};
+            borrowFields["userUID"] = QJsonObject{{"stringValue", studentUID}};
+            borrowFields["userName"] = QJsonObject{{"stringValue", studentName}};
+            borrowFields["borrowDate"] = QJsonObject{{"stringValue", QDate::currentDate().toString(Qt::ISODate)}};
+            borrowFields["dueDate"] = QJsonObject{{"stringValue", QDate::currentDate().addDays(14).toString(Qt::ISODate)}};
+            borrowFields["status"] = QJsonObject{{"stringValue", "Active"}};
+            borrowFields["issuedBy"] = QJsonObject{{"stringValue", adminUID}};
+
+            QJsonObject borrowDoc{{"fields", borrowFields}};
+
+            // Fire and forget the post
+            networkManager.post(borrowReq, QJsonDocument(borrowDoc).toJson());
+
+            // STEP 4: Decrement the Book Stock
+            QUrl updateBookUrl("https://firestore.googleapis.com/v1/projects/pocketlib-ea41d/databases/(default)/documents/books/" + bookId + "?updateMask.fieldPaths=available");
+            QNetworkRequest updateReq(updateBookUrl);
+            updateReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+            updateReq.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+            QJsonObject updateFields;
+            updateFields["available"] = QJsonObject{{"integerValue", QString::number(available - 1)}};
+            QJsonObject updateDoc{{"fields", updateFields}};
+
+            // Fire and forget the patch
+            networkManager.sendCustomRequest(updateReq, "PATCH", QJsonDocument(updateDoc).toJson());
+
+            // Finally, trigger success
+            callback(true, "Book issued successfully to " + studentName + "!");
+            bookReply->deleteLater();
+        });
+
+        reply->deleteLater();
+    });
+}

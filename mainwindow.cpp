@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->back_btn, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_3, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
+    connect(ui->back_btn_4, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
 
     connect(ui->seeMoreNew_btn, &QPushButton::clicked, this, [this]() {
         currentDashboardFilter = "new";
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // Start app at login screen
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
     // 1. Initialize Firebase Managers instead of SQLite
     authManager = new AuthManager(this);
     firestoreClient = new FirestoreClient(this);
@@ -56,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->dashboardSearch, &QLineEdit::textChanged,
             this, &MainWindow::handleDashboardSearch);
 
+    ui->myBooksGrid->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 MainWindow::~MainWindow()
@@ -90,10 +92,10 @@ void MainWindow::on_loginButton_clicked()
                                firestoreClient->getUserRole(uid, token, [this](QString role)
                                                             {
                                                                 if (role == "admin") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+                                                                    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
                                                                 }
                                                                 else if (role == "student") {
-                                                                    ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+                                                                    ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
                                                                     checkStudentFines(); // Triggers the bell check
                                                                     loadStudentDashboard();
                                                                 }
@@ -108,7 +110,7 @@ void MainWindow::on_loginButton_clicked()
 
 void MainWindow::on_openRegisterButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->registerPage);
+    ui->stackedWidget->setCurrentWidget(ui->registerPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -117,7 +119,7 @@ void MainWindow::on_openRegisterButton_clicked()
 
 void MainWindow::on_backToLoginButton_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -205,11 +207,11 @@ void MainWindow::openDashboard(QString role)
 {
     if(role == "admin")
     {
-        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     }
     else
     {
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
     }
     currentRole = role;
 }
@@ -226,7 +228,7 @@ void MainWindow::on_logoutStudent_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 //////////////////////////////////////////////////////////////
@@ -241,7 +243,7 @@ void MainWindow::on_logoutAdmin_clicked()
     ui->loginEmail->clear();
     ui->loginPassword->clear();
 
-    ui->stackedwidget->setCurrentWidget(ui->loginPage);
+    ui->stackedWidget->setCurrentWidget(ui->loginPage);
 }
 
 void MainWindow::on_sidebar_btn_clicked()
@@ -254,13 +256,13 @@ void MainWindow::on_sidebar_btn_clicked()
 
 void MainWindow::on_addBooks_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
 void MainWindow::handleSharedAction() {
-    if(currentRole=="admin") ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
-    else ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+    if(currentRole=="admin") ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+    else ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 //////////////////////////////////////////////////////////////
 // OPEN USER MONITORING PAGE
@@ -268,7 +270,7 @@ void MainWindow::handleSharedAction() {
 
 void MainWindow::on_userMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->userMonitoringPage);
+    ui->stackedWidget->setCurrentWidget(ui->userMonitoringPage);
 
 
         // Fetch the books and send them to the table!
@@ -284,7 +286,7 @@ void MainWindow::on_userMonitoring_btn_clicked()
 
 void MainWindow::on_backFromMonitoring_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
 }
 
 void MainWindow::on_notificationBell_clicked()
@@ -419,7 +421,7 @@ void MainWindow::on_addBook_btn_clicked()
 
 void MainWindow::on_profile_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->profile_page);
+    ui->stackedWidget->setCurrentWidget(ui->profile_page);
 
 firestoreClient->getUserInfo(currentUID, currentToken,
                                 [this](UserInfo info)
@@ -476,12 +478,12 @@ void MainWindow::on_change_name_btn_clicked()
 }
 
 // This function is triggered when the "Back" button on the Book View Page is clicked.
-// It switches the stackedwidget back to the student dashboard page.
+// It switches the stackedWidget back to the student dashboard page.
 void MainWindow::on_backButton_clicked()
 {
     // stackedWidget contains all the pages of the application.
     // setCurrentWidget() changes the visible page.
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 }
 
 
@@ -492,13 +494,15 @@ void MainWindow::bookViewPage(QString title,
                               QString category,
                               QString rating,
                               QString description,
-                              QIcon coverIcon) // <--- ADD THIS
+                              QIcon coverIcon,
+                              QString bookId, QString coverUrl, QString Qty)
 {
     ui->bookTitleLabel->setText(title);
     ui->bookAuthorLabel->setText(author);
     ui->bookCategoryLabel->setText(category);
     ui->bookRatingLabel->setText(rating);
     ui->bookDescriptionText->setText(description);
+    ui->availabilityLabel->setText(Qty);
 
     // --- NEW: Set the image ---
     // Extract a nice big pixmap from the icon to fit your label
@@ -508,7 +512,30 @@ void MainWindow::bookViewPage(QString title,
     ui->bookImage_label->setScaledContents(true);
     // --------------------------
 
+    currentBookId  = bookId;
+    currentCoverUrl = coverUrl;
+
+    // Show correct button state — "Already Saved" if book is in their list
+    if (savedBookIds.contains(bookId)) {
+        ui->addToMyBooks_btn->setText("✔  Already in My Books");
+        ui->addToMyBooks_btn->setEnabled(false);
+    } else {
+        ui->addToMyBooks_btn->setText("＋  Add to My Books");
+        ui->addToMyBooks_btn->setEnabled(true);
+    }
+    if (savedBookIds.contains(bookId)) {
+        ui->addToMyBooks_btn->setEnabled(false);
+        ui->addToMyBooks_btn->setText("✔  Already in My Books");
+        ui->rmbook_btn->setVisible(true);
+    } else {
+        // Book not saved — show Add, hide Remove
+        ui->addToMyBooks_btn->setText("＋  Add to My Books");
+        ui->addToMyBooks_btn->setEnabled(true);
+        ui->rmbook_btn->setVisible(false);
+    }
     ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
+
+
 }
 
 void MainWindow::on_update_btn_clicked()
@@ -583,7 +610,7 @@ void MainWindow::on_remove_btn_clicked()
 
 void MainWindow::on_inventory_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->inventory);
+    ui->stackedWidget->setCurrentWidget(ui->inventory);
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
                                 {
                                     ui->tableWidget_books->setRowCount(0);
@@ -649,6 +676,18 @@ void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
     ui->lineEdit_coverUrl->setText(
         ui->tableWidget_books->item(row, 8)->text());
 
+
+    ui->bookTitleLabel->setText(
+        ui->tableWidget_books->item(row, 1)->text());
+    ui->bookAuthorLabel->setText(
+        ui->tableWidget_books->item(row, 2)->text());
+    ui->bookCategoryLabel->setText(
+        ui->tableWidget_books->item(row, 3)->text());
+    ui->bookRatingLabel->setText(
+        (ui->tableWidget_books->item(row, 4)->text()));
+    ui->availabilityLabel->setText("Available copies: "+
+        (ui->tableWidget_books->item(row, 5)->text()));
+
     // Show which book is selected
     ui->label_selectedBook->setText(
         "Selected: " + ui->tableWidget_books->item(row, 1)->text()
@@ -660,7 +699,7 @@ void MainWindow::on_tableWidget_books_cellClicked(int row, int column)
 
 void MainWindow::on_update_to_add_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->addRemove_page);
+    ui->stackedWidget->setCurrentWidget(ui->addRemove_page);
 }
 
 
@@ -669,7 +708,7 @@ void MainWindow::on_update_to_add_btn_clicked()
 void MainWindow::on_search_btn_clicked()
 {
     // Switch the stacked widget to the Search Page
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 
     // Fetch the live inventory from Firestore and pass it to the grid
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books) {
@@ -764,6 +803,8 @@ void MainWindow::populateBookGrid(QList<Book> books)
         bookItem->setData(Qt::UserRole + 2, b.category);
         bookItem->setData(Qt::UserRole + 3, QString::number(b.rating));
         bookItem->setData(Qt::UserRole + 4, b.description);
+        bookItem->setData(Qt::UserRole + 5, b.coverUrl);
+        bookItem->setData(Qt::UserRole + 6, b.available);
 
         ui->bookCoverGrid->addItem(bookItem);
 
@@ -806,12 +847,15 @@ void MainWindow::on_bookCoverGrid_itemClicked(QListWidgetItem *item)
     QString category    = item->data(Qt::UserRole + 2).toString();
     QString rating      = item->data(Qt::UserRole + 3).toString();
     QString description = item->data(Qt::UserRole + 4).toString();
+    QString bookId      = item->data(Qt::UserRole).toString();
+    QString coverUrl    = item->data(Qt::UserRole + 5).toString();  // ADD THIS (see Step 5)
+    QString Qty         = item->data(Qt::UserRole + 6).toString();
 
     // 3. Grab the actual image we downloaded for the grid
     QIcon coverIcon = item->icon();
 
     // 4. Pass ALL 6 items to your view page (Notice coverIcon is at the end!)
-    bookViewPage(title, author, category, rating, description, coverIcon);
+    bookViewPage(title, author, category, rating, description, coverIcon, bookId, coverUrl, Qty);
 }
 void MainWindow::on_browseImage_btn_clicked()
 {
@@ -860,6 +904,7 @@ void MainWindow::on_changepsd_btn_clicked()
 
     msgBox.exec();
 }
+
 
 void MainWindow::loadStudentDashboard()
 {
@@ -1107,4 +1152,234 @@ void MainWindow::handleDashboardSearch(const QString &text)
 
                                      populateBookGrid(filtered);
                                  });
+}
+
+void MainWindow::on_addToMyBooks_btn_clicked()
+{
+    if (currentBookId.isEmpty()) return;
+
+    // Build a Book object from what's displayed on screen
+    Book book;
+    book.id          = currentBookId;
+    book.title       = ui->bookTitleLabel->text();
+    book.author      = ui->bookAuthorLabel->text();
+    book.category    = ui->bookCategoryLabel->text();
+    book.rating      = ui->bookRatingLabel->text().toDouble();
+    book.description = ui->bookDescriptionText->toPlainText();
+    book.coverUrl    = currentCoverUrl;
+    book.available   = ui->availabilityLabel->text().toInt();   // assume available if they can see it
+
+    ui->addToMyBooks_btn->setEnabled(false);
+    ui->addToMyBooks_btn->setText("Saving…");
+
+    firestoreClient->addToMyBooks(currentUID, book, currentToken,
+                                  [this, book](bool success)
+                                  {
+                                      if (!success) {
+                                          QMessageBox::warning(this, "Error", "Could not save book. Try again.");
+                                          ui->addToMyBooks_btn->setEnabled(true);
+                                          ui->addToMyBooks_btn->setText("＋  Add to My Books");
+                                          return;
+                                      }
+
+                                      // Update local state so button stays greyed out if user comes back
+                                      savedBookIds.insert(book.id);
+
+                                      ui->addToMyBooks_btn->setText("✔  Already in My Books");
+                                      // button stays disabled — already saved
+
+                                      QMessageBox::information(this, "Saved!",
+                                                               "\"" + book.title + "\" added to My Books.");
+                                  });
+    ui->rmbook_btn->setVisible(true);
+}
+
+
+void MainWindow::on_myBooks_btn_clicked()
+{
+    ui->stackedwidget->setCurrentWidget(ui->myBooksPage);
+    loadMyBooksGrid();
+}
+void MainWindow::loadMyBooksGrid()
+{
+    ui->myBooksGrid->clear();
+    ui->myBooksGrid->setViewMode(QListWidget::IconMode);
+    ui->myBooksGrid->setIconSize(QSize(100, 150));
+    ui->myBooksGrid->setGridSize(QSize(140, 200));
+    ui->myBooksGrid->setResizeMode(QListWidget::Adjust);
+    ui->myBooksGrid->setMovement(QListWidget::Static);
+    ui->myBooksGrid->setWordWrap(true);
+    ui->myBooksGrid->setSpacing(8);
+
+    firestoreClient->getMyBooks(currentUID, currentToken,
+                                [this](QList<Book> books)
+                                {
+                                    // Rebuild the savedBookIds set while we're at it
+                                    savedBookIds.clear();
+
+                                    if (books.isEmpty()) {
+                                        // Show a friendly empty message as a non-clickable item
+                                        QListWidgetItem *empty = new QListWidgetItem("📚\nNo books\nsaved yet");
+                                        empty->setTextAlignment(Qt::AlignCenter);
+                                        empty->setFlags(Qt::NoItemFlags);
+                                        empty->setSizeHint(QSize(140, 200));
+                                        ui->myBooksGrid->addItem(empty);
+                                        return;
+                                    }
+
+                                    QNetworkAccessManager *imageManager = new QNetworkAccessManager(this);
+
+                                    for (const Book &b : books) {
+
+                                        savedBookIds.insert(b.id);
+
+                                        // Grey placeholder — same pattern as your populateBookGrid()
+                                        QPixmap placeholder(100, 150);
+                                        placeholder.fill(QColor("#1C2333"));
+
+                                        QListWidgetItem *item = new QListWidgetItem(QIcon(placeholder), b.title);
+                                        item->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+                                        item->setToolTip(b.title + "\n" + b.author);
+                                        item->setSizeHint(QSize(140, 200));
+
+                                        // Store data for click handling — same slots as bookCoverGrid
+                                        item->setData(Qt::UserRole,     b.id);
+                                        item->setData(Qt::UserRole + 1, b.author);
+                                        item->setData(Qt::UserRole + 2, b.category);
+                                        item->setData(Qt::UserRole + 3, QString::number(b.rating));
+                                        item->setData(Qt::UserRole + 4, b.description);
+                                        item->setData(Qt::UserRole + 5, b.coverUrl);
+                                        item->setData(Qt::UserRole + 6, b.available);
+
+                                        ui->myBooksGrid->addItem(item);
+
+                                        // Download cover image — identical to your existing approach
+                                        if (!b.coverUrl.isEmpty() && b.coverUrl.startsWith("http")) {
+                                            QNetworkReply *reply =
+                                                imageManager->get(QNetworkRequest(QUrl(b.coverUrl)));
+
+                                            connect(reply, &QNetworkReply::finished, [reply, item]() {
+                                                if (reply->error() == QNetworkReply::NoError) {
+                                                    QPixmap pixmap;
+                                                    if (pixmap.loadFromData(reply->readAll())) {
+                                                        item->setIcon(QIcon(
+                                                            pixmap.scaled(100, 150,
+                                                                          Qt::KeepAspectRatioByExpanding,
+                                                                          Qt::SmoothTransformation)
+                                                            ));
+                                                    }
+                                                }
+                                                reply->deleteLater();
+                                            });
+                                        }
+                                    }
+                                });
+}
+
+void MainWindow::on_myBooksGrid_itemClicked(QListWidgetItem *item)
+{
+    QString title = item->text();
+
+    // 2. Extract the hidden data
+    QString author      = item->data(Qt::UserRole + 1).toString();
+    QString category    = item->data(Qt::UserRole + 2).toString();
+    QString rating      = item->data(Qt::UserRole + 3).toString();
+    QString description = item->data(Qt::UserRole + 4).toString();
+    QString bookId      = item->data(Qt::UserRole).toString();
+    QString coverUrl    = item->data(Qt::UserRole + 5).toString();
+    QString Qty         = item->data(Qt::UserRole + 6).toString();
+
+
+    // 3. Grab the actual image we downloaded for the grid
+    QIcon coverIcon = item->icon();
+
+    // 4. Pass ALL 6 items to your view page (Notice coverIcon is at the end!)
+    bookViewPage(title, author, category, rating, description, coverIcon, bookId, coverUrl, Qty);
+}
+
+void MainWindow::on_rmbook_btn_clicked()
+{
+    if (currentBookId.isEmpty()) return;
+
+    auto confirm = QMessageBox::question(
+        this, "Remove Book",
+        "Remove \"" + ui->bookTitleLabel->text() + "\" from My Books?",
+        QMessageBox::Yes | QMessageBox::No
+        );
+    if (confirm != QMessageBox::Yes) return;
+
+    firestoreClient->removeFromMyBooks(currentUID, currentBookId, currentToken,
+                                       [this](bool success)
+                                       {
+                                           if (success) {
+                                               savedBookIds.remove(currentBookId);
+
+                                               // Update buttons so they reflect the new state
+                                               ui->rmbook_btn->setEnabled(false);
+                                               ui->addToMyBooks_btn->setText("＋  Add to My Books");
+                                               ui->addToMyBooks_btn->setEnabled(true);
+
+                                               // Refresh the grid if user goes back
+                                               loadMyBooksGrid();
+
+                                               QMessageBox::information(this, "Removed",
+                                                                        "Book removed from My Books.");
+                                           } else {
+                                               QMessageBox::warning(this, "Error", "Could not remove book.");
+                                           }
+                                       });
+
+}
+
+
+void MainWindow::on_View_btn_clicked()
+{
+    ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
+}
+
+// 1. Navigation: Go to the checkout page from Admin Dashboard
+void MainWindow::on_pushButton_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->adminCheckoutPage);
+}
+
+// 2. Navigation: Go back
+void MainWindow::on_checkout_back_btn_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
+}
+
+// 3. The Main Execution
+void MainWindow::on_checkout_issue_btn_clicked()
+{
+    QString studentEmail = ui->checkout_studentEmail_in->text().trimmed();
+    QString bookId = ui->checkout_bookId_in->text().trimmed();
+
+    if(studentEmail.isEmpty() || bookId.isEmpty()) {
+        QMessageBox::warning(this, "Missing Data", "Please enter both the Student's Email and the Book ID.");
+        return;
+    }
+
+    // Disable the button to prevent double-clicking while waiting for Firebase
+    ui->checkout_issue_btn->setEnabled(false);
+    ui->checkout_issue_btn->setText("Processing...");
+
+    // Call the heavy lifter function we just created
+    firestoreClient->adminCheckoutBook(studentEmail, bookId, currentToken, currentUID,
+                                       [this](bool success, QString message) {
+
+                                           // Re-enable the button once Firebase replies
+                                           ui->checkout_issue_btn->setEnabled(true);
+                                           ui->checkout_issue_btn->setText("Issue Book to Student");
+
+                                           if(success) {
+                                               QMessageBox::information(this, "Checkout Successful", message);
+                                               // Clear the inputs for the next student in line
+                                               ui->checkout_studentEmail_in->clear();
+                                               ui->checkout_bookId_in->clear();
+                                           } else {
+                                               QMessageBox::warning(this, "Checkout Failed", message);
+                                           }
+                                       });
+
 }

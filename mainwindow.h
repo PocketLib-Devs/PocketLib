@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QPixmap>
 #include <QVariant>
+#include <QSet>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,7 +29,8 @@ public:
                       QString category,
                       QString rating,
                       QString description,
-                      QIcon coverIcon);
+                      QIcon coverIcon,
+                      QString bookId, QString coverUrl, QString Qty);
 
 private slots:
 
@@ -75,9 +77,21 @@ private slots:
     void on_browseImage_btn_clicked();
     void on_forgotPassword_btn_clicked();
     void on_changepsd_btn_clicked();
+    void on_pushButton_clicked();
+    void on_checkout_back_btn_clicked();
+    void on_checkout_issue_btn_clicked();
 
     void handleDashboardSearch(const QString &text);
 
+    void on_addToMyBooks_btn_clicked();
+
+    void on_myBooks_btn_clicked();
+
+    void on_myBooksGrid_itemClicked(QListWidgetItem *item);
+
+    void on_rmbook_btn_clicked();
+
+    void on_View_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -100,6 +114,11 @@ private:
     void processMockPayment(int amount);
     void filterBooks();
     void populateBookGrid(QList<Book> books);
+    QString     currentBookId;
+    QString     currentCoverUrl;
+    QSet<QString> savedBookIds;
+    void on_myBooksGrid_customContextMenuRequested(const QPoint &pos);
+    void loadMyBooksGrid();
 
     void loadStudentDashboard();
     void populateSection(QHBoxLayout *layout, QList<Book> books);
