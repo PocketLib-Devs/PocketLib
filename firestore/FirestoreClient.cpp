@@ -681,7 +681,87 @@ void FirestoreClient::uploadImageToCloudinary(const QString &localFilePath, std:
         reply->deleteLater();
     });
 }
+void FirestoreClient::addToMyBooks(const QString &uid, const Book &book,
+                                   const QString &token,
+                                   std::function<void(bool)> callback)
+{
+    // Using the book's own ID as the document ID prevents duplicates automatically
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid
+                  + "/myBooks/" + book.id;
 
+    QNetworkRequest request((QUrl(url)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QJsonObject body;
+    body["fields"] = bookToFields(book);   // reuses your existing helper
+
+    QNetworkReply *reply = networkManager.sendCustomRequest(
+        request, "PATCH", QJsonDocument(body).toJson()
+        );
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
+        if (json.contains("error")) {
+            qDebug() << "addToMyBooks failed:"
+                     << json["error"].toObject()["message"].toString();
+            callback(false);
+        } else {
+            callback(true);
+        }
+        reply->deleteLater();
+    });
+}
+void FirestoreClient::getMyBooks(const QString &uid, const QString &token,
+                                 std::function<void(QList<Book>)> callback)
+{
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid + "/myBooks";
+
+    QNetworkRequest request((QUrl(url)));
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.get(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback, this]() {
+        QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
+        QList<Book> books;
+
+        if (!json.contains("error")) {
+            for (const QJsonValue &val : json["documents"].toArray()) {
+                QJsonObject doc = val.toObject();
+                books.append(fieldsToBook(doc["name"].toString(),
+                                          doc["fields"].toObject()));
+            }
+        } else {
+            qDebug() << "getMyBooks failed:"
+                     << json["error"].toObject()["message"].toString();
+        }
+
+        callback(books);
+        reply->deleteLater();
+    });
+}
+void FirestoreClient::removeFromMyBooks(const QString &uid, const QString &bookId,
+                                        const QString &token,
+                                        std::function<void(bool)> callback)
+{
+    QString url = "https://firestore.googleapis.com/v1/projects/" + projectId
+                  + "/databases/(default)/documents/users/" + uid
+                  + "/myBooks/" + bookId;
+
+    QNetworkRequest request((QUrl(url)));
+    request.setRawHeader("Authorization", ("Bearer " + token).toUtf8());
+
+    QNetworkReply *reply = networkManager.deleteResource(request);
+
+    connect(reply, &QNetworkReply::finished, [reply, callback]() {
+        int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        callback(status == 200);
+          reply->deleteLater();
+    });
+}
 
 void FirestoreClient::adminCheckoutBook(QString studentLibraryId, QString bookId, QString token, QString adminUID, std::function<void(bool, QString)> callback)
 {
