@@ -6,11 +6,16 @@
 #include "firestore/FirestoreClient.h"
 #include <QListWidgetItem>
 #include <QIcon>
+#include <QHBoxLayout>
+#include <QPixmap>
+#include <QVariant>
 #include <QSet>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+Q_DECLARE_METATYPE(QPixmap)
 
 class MainWindow : public QMainWindow
 {
@@ -76,6 +81,8 @@ private slots:
     void on_checkout_back_btn_clicked();
     void on_checkout_issue_btn_clicked();
 
+    void handleDashboardSearch(const QString &text);
+
     void on_addToMyBooks_btn_clicked();
 
     void on_myBooks_btn_clicked();
@@ -94,6 +101,8 @@ private:
 
     QString selectedBookId;
 
+    QString currentDashboardFilter;
+
     AuthManager *authManager;
     FirestoreClient *firestoreClient;
 
@@ -111,6 +120,15 @@ private:
     void on_myBooksGrid_customContextMenuRequested(const QPoint &pos);
     void loadMyBooksGrid();
 
+    void loadStudentDashboard();
+    void populateSection(QHBoxLayout *layout, QList<Book> books);
+    void openFilteredPage();
+
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 };
+
 
 #endif
