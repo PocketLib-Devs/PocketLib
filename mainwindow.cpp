@@ -20,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 
-    
-
     ui->setupUi(this);
     connect(ui->back_btn, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
     connect(ui->back_btn_2, &QPushButton::clicked, this, &MainWindow::handleSharedAction);
@@ -58,6 +56,16 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::handleDashboardSearch);
 
     ui->myBooksGrid->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    ui->sidebarWidget->setGeometry(-250, 0, 250, height());
+
+    sidebarAnim = new QPropertyAnimation(ui->sidebarWidget, "geometry");
+    sidebarAnim->setDuration(250);
+    sidebarAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    ui->hamburger_btn->raise();
+
+    ui->hamburger_btn->setAttribute(Qt::WA_TransparentForMouseEvents, false);
 }
 
 MainWindow::~MainWindow()
@@ -533,7 +541,7 @@ void MainWindow::bookViewPage(QString title,
         ui->addToMyBooks_btn->setEnabled(true);
         ui->rmbook_btn->setVisible(false);
     }
-    ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
+    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 
 
 }
@@ -719,9 +727,9 @@ void MainWindow::on_search_btn_clicked()
 void MainWindow::on_backFromSearch_btn_clicked()
 {
     if (currentRole == "admin")
-        ui->stackedwidget->setCurrentWidget(ui->adminDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->adminDashboardPage);
     else
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
 }
 
 // --- Live Search & Filter Logic ---
@@ -1012,6 +1020,9 @@ void MainWindow::populateSection(QHBoxLayout *layout, QList<Book> books)
         card->setProperty("category", b.category);
         card->setProperty("rating", QString::number(b.rating));
         card->setProperty("description", b.description);
+        card->setProperty("section", b.section);
+        card->setProperty("availability", QString::number(b.available));
+        card->setProperty("bookId", b.id);
 
         // Enable click
         card->installEventFilter(this);
@@ -1080,7 +1091,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     card->property("category").toString(),
                     card->property("rating").toString(),
                     card->property("description").toString(),
-                    icon
+                    icon,
+                    card->property("section").toString(),
+                    card->property("availability").toString(),
+                    card->property("bookId").toString()
                     );
 
                 return true;
@@ -1093,7 +1107,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::openFilteredPage()
 {
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 
     firestoreClient->getAllBooks(currentToken, [this](QList<Book> books)
                                  {
@@ -1125,13 +1139,13 @@ void MainWindow::handleDashboardSearch(const QString &text)
 {
     // If search is empty → go back to dashboard
     if (text.trimmed().isEmpty()) {
-        ui->stackedwidget->setCurrentWidget(ui->studentDashboardPage);
+        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
         loadStudentDashboard();
         return;
     }
 
     // Otherwise open search page
-    ui->stackedwidget->setCurrentWidget(ui->searchPage);
+    ui->stackedWidget->setCurrentWidget(ui->searchPage);
 
     // Fetch and filter
     firestoreClient->getAllBooks(currentToken, [this, text](QList<Book> books)
@@ -1197,7 +1211,7 @@ void MainWindow::on_addToMyBooks_btn_clicked()
 
 void MainWindow::on_myBooks_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->myBooksPage);
+    ui->stackedWidget->setCurrentWidget(ui->myBooksPage);
     loadMyBooksGrid();
 }
 void MainWindow::loadMyBooksGrid()
@@ -1334,7 +1348,7 @@ void MainWindow::on_rmbook_btn_clicked()
 
 void MainWindow::on_View_btn_clicked()
 {
-    ui->stackedwidget->setCurrentWidget(ui->bookViewPage);
+    ui->stackedWidget->setCurrentWidget(ui->bookViewPage);
 }
 
 // 1. Navigation: Go to the checkout page from Admin Dashboard
@@ -1382,4 +1396,40 @@ void MainWindow::on_checkout_issue_btn_clicked()
                                            }
                                        });
 
+}
+
+void MainWindow::on_hamburger_btn_clicked()
+{
+    QRect startRect;
+    QRect endRect;
+
+    if (ui->sidebarWidget->x() < 0)
+    {
+        // OPEN
+        startRect = QRect(-250, 0, 250, height());
+        endRect   = QRect(0, 0, 250, height());
+    }
+    else
+    {
+        // CLOSE
+        startRect = QRect(0, 0, 250, height());
+        endRect   = QRect(-250, 0, 250, height());
+    }
+
+    sidebarAnim->stop();
+    sidebarAnim->setStartValue(startRect);
+    sidebarAnim->setEndValue(endRect);
+    sidebarAnim->start();
+
+    // Keep button always clickable
+    ui->hamburger_btn->raise();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+    // Keep sidebar height correct
+    QRect geo = ui->sidebarWidget->geometry();
+    ui->sidebarWidget->setGeometry(geo.x(), 0, geo.width(), height());
 }

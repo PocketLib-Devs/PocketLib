@@ -10,6 +10,7 @@
 #include <QPixmap>
 #include <QVariant>
 #include <QSet>
+#include <QPropertyAnimation>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -93,8 +94,12 @@ private slots:
 
     void on_View_btn_clicked();
 
+    void on_hamburger_btn_clicked();
+
 private:
     Ui::MainWindow *ui;
+
+    QPropertyAnimation *sidebarAnim;
 
     QString currentUserName;
     QString currentRole;
@@ -127,6 +132,7 @@ private:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 };
 
