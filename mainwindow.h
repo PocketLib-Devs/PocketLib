@@ -101,6 +101,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    QWidget *previousPage = nullptr;
+
     QPropertyAnimation *sidebarAnim;
 
     QString currentUserName;
