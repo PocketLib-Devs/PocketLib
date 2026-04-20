@@ -54,7 +54,7 @@ QPushButton:pressed {
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="loginPage">
        <layout class="QGridLayout" name="gridLayout_5">
@@ -1107,6 +1107,34 @@ QPushButton:hover {
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="2">
+          <widget class="QPushButton" name="inventory_btn">
+           <property name="text">
+            <string>Inventory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="addBooks_btn">
+           <property name="text">
+            <string>Add/Remove Books</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Borrow/extension request</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="userMonitoring_btn">
+           <property name="text">
+            <string>User Monitoring</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0" rowspan="2">
           <widget class="QWidget" name="widget" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1209,46 +1237,24 @@ QPushButton:hover {
            </layout>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="addBooks_btn">
-           <property name="text">
-            <string>Add/Remove Books</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="inventory_btn">
-           <property name="text">
-            <string>Inventory</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="userMonitoring_btn">
-           <property name="text">
-            <string>User Monitoring</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="pushButton">
-           <property name="text">
-            <string>Borrow/extension request</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
-       <widget class="QPushButton" name="search_btn">
+       <widget class="QLineEdit" name="adminDashboardSearch">
         <property name="geometry">
          <rect>
-          <x>320</x>
+          <x>190</x>
           <y>10</y>
-          <width>121</width>
-          <height>29</height>
+          <width>431</width>
+          <height>31</height>
          </rect>
         </property>
+        <property name="inputMask">
+         <string/>
+        </property>
         <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
          <string>Search</string>
         </property>
        </widget>

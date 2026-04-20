@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->dashboardSearch, &QLineEdit::textChanged,
             this, &MainWindow::handleDashboardSearch);
 
+    connect(ui->adminDashboardSearch, &QLineEdit::textChanged,
+            this, &MainWindow::handleDashboardSearch);
+
     ui->myBooksGrid->setContextMenuPolicy(Qt::CustomContextMenu);
 
     ui->sidebarWidget->setGeometry(-250, 0, 250, height());
@@ -1167,21 +1170,29 @@ void MainWindow::openFilteredPage()
 
 void MainWindow::handleDashboardSearch(const QString &text)
 {
-    // If search is empty → go back to dashboard
+    QWidget *currentDashboard;
+
+    if (ui->stackedWidget->currentWidget() == ui->adminDashboardPage)
+        currentDashboard = ui->adminDashboardPage;
+    else
+        currentDashboard = ui->studentDashboardPage;
+
+    // If search is empty → go back
     if (text.trimmed().isEmpty()) {
-        ui->stackedWidget->setCurrentWidget(ui->studentDashboardPage);
-        loadStudentDashboard();
+        ui->stackedWidget->setCurrentWidget(currentDashboard);
+
+        if (currentDashboard == ui->studentDashboardPage)
+            loadStudentDashboard(); // only reload student
+
         return;
     }
 
     // Otherwise open search page
     ui->stackedWidget->setCurrentWidget(ui->searchPage);
 
-    // Fetch and filter
     firestoreClient->getAllBooks(currentToken, [this, text](QList<Book> books)
                                  {
                                      QList<Book> filtered;
-
                                      QString query = text.toLower();
 
                                      for (const Book &b : books)
@@ -1197,6 +1208,7 @@ void MainWindow::handleDashboardSearch(const QString &text)
                                      populateBookGrid(filtered);
                                  });
 }
+
 
 void MainWindow::on_addToMyBooks_btn_clicked()
 {
