@@ -225,19 +225,6 @@ QPushButton:hover {
        </layout>
       </widget>
       <widget class="QWidget" name="studentDashboardPage">
-       <widget class="QPushButton" name="logoutStudent">
-        <property name="geometry">
-         <rect>
-          <x>330</x>
-          <y>440</y>
-          <width>90</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Logout</string>
-        </property>
-       </widget>
        <widget class="QWidget" name="horizontalLayoutWidget">
         <property name="geometry">
          <rect>
@@ -552,7 +539,35 @@ QPushButton:hover {
                    <string>My Profile</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                   <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="profile_btn_user">
+                  <property name="text">
+                   <string>My Profile</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="myBooks_btn_user">
+                  <property name="text">
+                   <string>My Books</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="history_btn_user">
+                  <property name="text">
+                   <string>My borrow history</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="transaction_btn_user">
+                  <property name="text">
+                   <string>My transaction history</string>
                   </property>
                  </widget>
                 </item>
@@ -564,49 +579,34 @@ QPushButton:hover {
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="profile_btn_3">
-                  <property name="text">
-                   <string>My Profile</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="myBooks_btn_3">
-                  <property name="text">
-                   <string>My Books</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="history_btn_3">
-                  <property name="text">
-                   <string>My borrow history</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="transaction_btn_3">
-                  <property name="text">
-                   <string>My transaction history</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="help_btn_3">
+                 <widget class="QPushButton" name="help_btn_user">
                   <property name="text">
                    <string>Need Help</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="about_btn_3">
+                 <widget class="QPushButton" name="about_btn_user">
                   <property name="text">
                    <string>About us</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="logoutAdmin_3">
+                 <spacer name="verticalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>10</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="logoutStudent">
                   <property name="text">
                    <string>Logout</string>
                   </property>
@@ -1118,14 +1118,7 @@ QPushButton:hover {
                  <string>My Profile</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string/>
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -1158,6 +1151,13 @@ QPushButton:hover {
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="help_btn">
                 <property name="text">
                  <string>Need Help</string>
@@ -1170,6 +1170,19 @@ QPushButton:hover {
                  <string>About us</string>
                 </property>
                </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_11">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item>
                <widget class="QPushButton" name="logoutAdmin">

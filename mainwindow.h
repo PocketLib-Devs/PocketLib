@@ -56,6 +56,7 @@ private slots:
     void on_addBook_btn_clicked();
 
     void on_profile_btn_clicked();
+    void on_profile_btn_user_clicked();
 
     void on_change_name_btn_clicked();
     void on_backButton_clicked();
@@ -87,6 +88,7 @@ private slots:
     void on_addToMyBooks_btn_clicked();
 
     void on_myBooks_btn_clicked();
+    void on_myBooks_btn_user_clicked();
 
     void on_myBooksGrid_itemClicked(QListWidgetItem *item);
 
