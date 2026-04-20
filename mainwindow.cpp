@@ -84,6 +84,21 @@ MainWindow::MainWindow(QWidget *parent)
             ui->stackedWidget->setCurrentWidget(previousPage);
     });
 
+    connect(ui->about_btn_user, &QPushButton::clicked, this, [=]() {
+        previousPage = ui->stackedWidget->currentWidget();
+        ui->stackedWidget->setCurrentWidget(ui->aboutPage);
+    });
+
+    connect(ui->about_btn, &QPushButton::clicked, this, [=]() {
+        previousPage = ui->stackedWidget->currentWidget();
+        ui->stackedWidget->setCurrentWidget(ui->aboutPage);
+    });
+
+    connect(ui->backFromAbout_btn, &QPushButton::clicked, this, [=]() {
+        if (previousPage)
+            ui->stackedWidget->setCurrentWidget(previousPage);
+    });
+
 
 }
 

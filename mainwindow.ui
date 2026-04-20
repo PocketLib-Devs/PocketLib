@@ -54,7 +54,7 @@ QPushButton:pressed {
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>8</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="loginPage">
        <layout class="QGridLayout" name="gridLayout_5">
@@ -1438,6 +1438,98 @@ QPushButton:hover {
           </widget>
          </item>
         </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="aboutPage">
+       <widget class="QLabel" name="label_14">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>10</y>
+          <width>111</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>PocketLib 📚</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="backFromAbout_btn">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>410</y>
+          <width>90</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Back</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_15">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>50</y>
+          <width>391</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>A smart digital library system designed to manage books,
+track borrowing, and enhance user experience.
+</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_16">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>110</y>
+          <width>161</width>
+          <height>181</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Developed by:
+
+- Aishwarya Jain
+- Dhruv Sharma
+- Aditya Mate
+- Anurag
+- Avtansh Singh Brar
+- Kritika Dewangan
+</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_17">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>290</y>
+          <width>211</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Contact:
+📧 support@pocketlib.com
+🏫 Campus Library System</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_18">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>380</y>
+          <width>91</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Version: 1.0</string>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="userMonitoringPage">
