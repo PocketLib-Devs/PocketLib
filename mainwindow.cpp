@@ -69,6 +69,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->hamburger_btn->raise();
     ui->hamburger_btn->setAttribute(Qt::WA_TransparentForMouseEvents, false);
 
+    connect(ui->help_btn_user, &QPushButton::clicked, this, [=]() {
+        previousPage = ui->stackedWidget->currentWidget();
+        ui->stackedWidget->setCurrentWidget(ui->helpPage);
+    });
+
+    connect(ui->help_btn, &QPushButton::clicked, this, [=]() {
+        previousPage = ui->stackedWidget->currentWidget();
+        ui->stackedWidget->setCurrentWidget(ui->helpPage);
+    });
+
+    connect(ui->backFromHelp_btn, &QPushButton::clicked, this, [=]() {
+        if (previousPage)
+            ui->stackedWidget->setCurrentWidget(previousPage);
+    });
+
 
 }
 
