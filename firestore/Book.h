@@ -3,13 +3,10 @@
 
 #include <QString>
 
-// ─────────────────────────────────────────────
-//  Plain data struct that mirrors a Firestore
-//  document in the "books" collection.
-// ─────────────────────────────────────────────
+
 struct Book
 {
-    QString id;           // Firestore document ID (auto-generated or custom)
+    QString id;
     QString title;
     QString author;
     int     available;
@@ -20,4 +17,4 @@ struct Book
     QString section;
 };
 
-#endif // BOOK_H
+#endif

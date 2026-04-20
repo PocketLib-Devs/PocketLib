@@ -3,17 +3,15 @@
 
 #include <QString>
 
-// ─────────────────────────────────────────────────────────────────────────
-//  Plain struct that mirrors a document in the "users" collection.
-// ─────────────────────────────────────────────────────────────────────────
+
 struct UserInfo
 {
     QString uid;
     QString name;
     QString email;
     QString role;
-    QString libraryId;   // e.g. "John4782"
+    QString libraryId;
     int     fineAmount = 0;
 };
 
-#endif // USERINFO_H
+#endif

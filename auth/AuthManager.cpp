@@ -35,7 +35,7 @@ void AuthManager::loginUser(QString email, QString password,
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
                 QJsonObject json = jsonDoc.object();
 
-                // Check if Firebase returned an error
+
                 if (json.contains("error")) {
                     QString message =
                         json["error"].toObject()["message"].toString();

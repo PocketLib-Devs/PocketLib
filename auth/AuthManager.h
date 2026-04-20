@@ -25,8 +25,6 @@ private:
 
     const QString apiKey = "AIzaSyDd4x5PuwJi8Coi4ii6o93QbcYeBr_ArIg";
 
-
-    // ADD THIS LINE HERE:
     QString m_token;
 };
 
