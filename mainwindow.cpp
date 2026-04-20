@@ -64,8 +64,9 @@ MainWindow::MainWindow(QWidget *parent)
     sidebarAnim->setEasingCurve(QEasingCurve::OutCubic);
 
     ui->hamburger_btn->raise();
-
     ui->hamburger_btn->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -454,6 +455,35 @@ firestoreClient->getUserInfo(currentUID, currentToken,
             ui->fine_label->setStyleSheet("color: green;");
         }
     });
+}
+
+void MainWindow::on_profile_btn_user_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->profile_page);
+
+    firestoreClient->getUserInfo(currentUID, currentToken,
+                                 [this](UserInfo info)
+                                 {
+                                     // Guard: if uid is empty the fetch failed
+                                     if (info.uid.isEmpty()) {
+                                         QMessageBox::warning(this, "Error",
+                                                              "Could not load user information.");
+                                         return;
+                                     }
+                                     ui->name_label->setText(info.name);
+                                     ui->email_label->setText(info.email);
+                                     ui->role_label->setText(info.role);
+                                     ui->libid_label->setText(info.libraryId);
+                                     ui->fine_label->setText("₹ " + QString::number(info.fineAmount));
+                                     currentUserName = info.name;
+
+                                     // Optional: highlight fine in red if > 0
+                                     if (info.fineAmount > 0) {
+                                         ui->fine_label->setStyleSheet("color: red; font-weight: bold;");
+                                     } else {
+                                         ui->fine_label->setStyleSheet("color: green;");
+                                     }
+                                 });
 }
 
 
@@ -1214,6 +1244,13 @@ void MainWindow::on_myBooks_btn_clicked()
     ui->stackedWidget->setCurrentWidget(ui->myBooksPage);
     loadMyBooksGrid();
 }
+
+void MainWindow::on_myBooks_btn_user_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->myBooksPage);
+    loadMyBooksGrid();
+}
+
 void MainWindow::loadMyBooksGrid()
 {
     ui->myBooksGrid->clear();
@@ -1406,14 +1443,14 @@ void MainWindow::on_hamburger_btn_clicked()
     if (ui->sidebarWidget->x() < 0)
     {
         // OPEN
-        startRect = QRect(-250, 0, 250, height());
-        endRect   = QRect(0, 0, 250, height());
+        startRect = QRect(-250, 30, 250, height());
+        endRect   = QRect(0, 30, 250, height());
     }
     else
     {
         // CLOSE
-        startRect = QRect(0, 0, 250, height());
-        endRect   = QRect(-250, 0, 250, height());
+        startRect = QRect(0, 30, 250, height());
+        endRect   = QRect(-250, 30, 250, height());
     }
 
     sidebarAnim->stop();
